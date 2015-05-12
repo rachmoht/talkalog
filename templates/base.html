@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+	<title>{% block title %}Audio Project{% endblock %}</title>
+	<script src="http://code.jquery.com/jquery.js"></script>
+</head>
+<body>
+	{% if 'email' in session %}
+        <a href='/logout'>Logout </a>
+    {% else %}
+        <a href='/login'> Login </a>
+        <a href='/signup'>Sign Up</a>
+    {% endif %}
+
+	<!-- Show flashed messages -->
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+          <div class="alert alert-warning">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+	{% block content %}
+		Content here.
+	{% endblock %}
+</body>
+</html>
