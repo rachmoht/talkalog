@@ -32,23 +32,7 @@ def index():
     return render_template("homepage.html")
 
 
-@app.route('/record')
-def record_audio():
-	"""Record audio. Capture data and be able to callback."""
-
-	return render_template("record.html")
-
-
-@app.route('/process-audio')
-def process_audio():
-	"""Save captured audio and save to server."""
-	audiofile = request.form['audio_file']
-
-	return render_template("saved.html", audio=audiofile)
-
-
-# START OF TEST PYTHON RECORDING
-
+# START OF RECORDING
 def is_allowed_file(filename):
 	print 'filename: ', filename
 	print filename.rsplit('.', 1)[1]
@@ -57,7 +41,7 @@ def is_allowed_file(filename):
 	return '.' in filename and \
 		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-@app.route('/record-test', methods=['GET', 'POST'])
+@app.route('/record', methods=['GET', 'POST'])
 def record_audio_test():
 	"""Record audio. Capture data and be able to callback."""
 	print 'GET method on record-test'
@@ -74,9 +58,8 @@ def record_audio_test():
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			print 'If file and allowed_file....'
 		flash('Saved file!')
-		redirect('/')
 	
-	return render_template("record-test3.html")
+	return render_template("record.html")
 
 
 @app.route('/login')
