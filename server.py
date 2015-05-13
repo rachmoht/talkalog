@@ -25,6 +25,7 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
+
 @app.route('/')
 def index():
     """Home."""
@@ -32,11 +33,10 @@ def index():
     return render_template("homepage.html")
 
 
-# START OF RECORDING
+# Start of Recording
 def is_allowed_file(filename):
 	print 'filename: ', filename
-	print filename.rsplit('.', 1)[1]
-	print 'Allowed Extensions: ', ALLOWED_EXTENSIONS
+	print 'this mimetype: ', filename.rsplit('.', 1)[1]
 	print '**************'
 	return '.' in filename and \
 		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -47,21 +47,33 @@ def record_audio_test():
 	print 'GET method on record-test'
 
 	if request.method == 'POST':
-		print 'POST method here'
-		print 'more test printing'
-
+		flash('Saved file!')
 		print 'is there a file attached? ', request.files
 		file = request.files['file']
 		print file
 		if file and is_allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			print 'If file and allowed_file....'
-		flash('Saved file!')
-	
-	return render_template("record.html")
+
+			return redirect('/')
+	else: 
+		return render_template("record.html")
 
 
+@app.route('/generate')
+def generate_urls():
+	"""Generate random, unique string for private user associated URLs."""
+	pass
+
+
+@app.route('/user/<int:id>')
+def user_page(id):
+	"""Show more information about the single user logged in."""
+	user = User.query.get(user_id)
+
+    return render_template("user_page.html", user=user)
+
+# User Login and Register 
 @app.route('/login')
 def login_user():
 	"""Login page for user."""
@@ -107,9 +119,9 @@ def signup_process():
 	user = User.query.filter_by(email=entered_email).first()
 
 	if request.method == "POST":
-		if user == None: # is not in User Table?
+		if user == None: 
 			print user 
-			if entered_pw != entered_pw2:  #validate passwords
+			if entered_pw != entered_pw2:  
 				flash("Your passwords did not match")
 				return redirect("/signup")
 			else:
