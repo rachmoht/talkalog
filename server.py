@@ -2,12 +2,20 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, redirect, request, flash, session
+from flask import Flask, render_template, redirect, request, flash, session, url_for
 from flask_debugtoolbar import DebugToolbarExtension
+
+from werkzeug import secure_filename
+
+import os
 
 from model import User, Upload, Collection, RequestURLs, CollectionsUsers, CollectionsUploads, connect_to_db, db
 
+UPLOAD_FOLDER = 'uploads/'
+ALLOWED_EXTENSIONS = set(['wav'])
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
@@ -20,7 +28,7 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
     """Home."""
-
+    flash('Welcome!')
     return render_template("homepage.html")
 
 
@@ -37,6 +45,38 @@ def process_audio():
 	audiofile = request.form['audio_file']
 
 	return render_template("saved.html", audio=audiofile)
+
+
+# START OF TEST PYTHON RECORDING
+
+def is_allowed_file(filename):
+	print 'filename: ', filename
+	print filename.rsplit('.', 1)[1]
+	print 'Allowed Extensions: ', ALLOWED_EXTENSIONS
+	print '**************'
+	return '.' in filename and \
+		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+@app.route('/record-test', methods=['GET', 'POST'])
+def record_audio_test():
+	"""Record audio. Capture data and be able to callback."""
+	print 'GET method on record-test'
+
+	if request.method == 'POST':
+		print 'POST method here'
+		print 'more test printing'
+
+		print 'is there a file attached? ', request.files
+		file = request.files['file']
+		print file
+		if file and is_allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			print 'If file and allowed_file....'
+		flash('Saved file!')
+		redirect('/')
+	
+	return render_template("record-test3.html")
 
 
 @app.route('/login')
