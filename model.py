@@ -24,8 +24,8 @@ class User(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<User user_id: %s email: %s first_name: %s last_name: %s>" % (
-        self.user_id, self.email, self.first_name, self.last_name)
+        return "<User: %s email: %s first_name: %s last_name: %s>" % (
+        self.id, self.email, self.first_name, self.last_name)
 
 
 class Upload(db.Model):
@@ -37,8 +37,8 @@ class Upload(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
     title = db.Column(db.String, nullable=False, default='Untitled')
     description = db.Column(db.String)
-    path = db.Column(db.String(50)) # arecording.mp3
-    mimetype = db.Column(db.String(50)) # jpg, mp3
+    path = db.Column(db.String(50))
+    mimetype = db.Column(db.String(50), default='wav') # wav, jpg, mp3
 
     user = db.relationship("User", backref=db.backref("uploads", order_by=id))
 
@@ -60,7 +60,7 @@ class RequestURLs(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
     upload_id = db.Column(db.Integer, db.ForeignKey('Uploads.id'), nullable=False)
 
-    user = db.relationship("User", backref=db.backref("collections", order_by=id))
+    user = db.relationship("User", backref=db.backref("requesturls", order_by=id))
 
     def __repr__(self):
         """Provide helpful representation when printed."""

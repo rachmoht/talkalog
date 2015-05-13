@@ -4,6 +4,22 @@
     <h2>User {{ user.id }}</h2>
     <ul>
       <li>{{ user.email }}</li>
+      <li><a href="/record-loggedin">Record something!</a>
     </ul>
+
+    {% if user.uploads %}
+    <h2>All My Files</h2>
+    <ul>
+    	{% for upload in user.uploads %}
+    		<li>
+				<audio controls>
+					<source src="/uploads/{{ upload.path }}" type="audio/wav">
+				</audio>
+
+    			<p><a href="/uploads/{{ upload.path }}">{{ upload.path }}</a></p>
+    		</li>
+    	{% endfor %}
+    </ul>
+    {% endif %}
 
 {% endblock %}
