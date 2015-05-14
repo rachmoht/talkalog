@@ -7,9 +7,13 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from werkzeug import secure_filename
 
+import random
+
+import string
+
 import os
 
-from model import User, Upload, Collection, RequestURLs, CollectionsUsers, CollectionsUploads, connect_to_db, db
+from model import User, Upload, Collection, RequestURL, CollectionsUsers, CollectionsUploads, connect_to_db, db
 
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = set(['wav'])
@@ -99,19 +103,58 @@ def record_user_audio_test():
 	return render_template("record-test.html")
 
 
+def id_generator(size=20, chars=string.ascii_uppercase + string.digits):
+	return ''.join(random.choice(chars) for _ in range(size))
 
 
-
-@app.route('/generate')
-def generate_urls():
+@app.route('/generate', methods=['GET', 'POST'])
+def generate_request_str():
 	"""Generate random, unique string for private user associated URLs."""
-	pass
+
+	generated_url = False
+
+	if "email" in session: #if logged in
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+
+		if request.method == 'POST':
+			request_str = id_generator()
+			print 'Generated request string', request_str
+
+			new_upload_placeholder = Upload(user_id=user.id)
+
+			db.session.add(new_upload_placeholder)
+			db.session.commit()
+
+			print 'New Upload ID: ', new_upload_placeholder.id
+			new_upload_id = new_upload_placeholder.id
+			print 'Generated new upload id: ', new_upload_id
+			print 'Created new upload placeholder ', new_upload_placeholder
+
+			print 'Adding new new_upload_placeholder'
+
+			new_request_url = RequestURL(id=request_str, user_id=user.id, upload_id=new_upload_id)
+			print 'Created new RequestURL: ', new_request_url
+
+			db.session.add(new_request_url)
+			db.session.commit()
+
+			generated_url = request_str
+
+	else:
+		flash('You must be logged in to generate request URL!')
+		return redirect('/login')
+
+	return render_template("generate.html", generated_url=generated_url)
+
+
+
 
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
+	"""This route is required to serve up files from the uploads folder."""
+	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/user/<int:id>')
 def user_page(id):
@@ -119,6 +162,45 @@ def user_page(id):
 	user = User.query.get(id)
 
 	return render_template("user_page.html", user=user)
+
+
+
+
+@app.route('/request/<string:id>', methods=['GET', 'POST'])
+def requested_audio_page(id):
+	"""Show more information about the single user logged in."""
+	requested_obj = RequestURL.query.get(id)
+	assoc_upload = Upload.query.get(requested_obj.upload_id)
+	print assoc_upload
+
+	if request.method == 'POST':
+		file = request.files['file']
+		print 'FILE: ', file
+
+		title = request.form.get('title')
+		print 'TITLE: ', title
+
+		desc = request.form.get('desc')
+		print 'DESC: ', desc
+
+		# if file and is_allowed_file(file.filename):
+		# 	filename = secure_filename(file.filename)
+		# 	new_recording = Upload(user_id=user.id, title=title, description=desc,
+		# 		path=filename)
+		# 	print 'Created new recording ', new_recording
+		# 	db.session.add(new_recording)
+		# 	print 'Adding new recording'
+		# 	db.session.commit()
+		# 	print 'Committed new recording %s' % filename
+
+		# 	file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+
+
+
+
+	return render_template("request_page.html", requested_obj=requested_obj)
+
 
 
 # User Login and Register 
