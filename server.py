@@ -7,14 +7,13 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from werkzeug import secure_filename
 
-import random
-
-import string
-
 import os
+import string
+import random
 
 from model import User, Upload, Collection, RequestURL, CollectionsUsers, CollectionsUploads, connect_to_db, db
 
+# Required for saving our wav files to our server @ uploads/
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = set(['wav'])
 
@@ -33,7 +32,6 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
     """Home."""
-    flash('Welcome!')
     return render_template("homepage.html")
 
 
@@ -148,13 +146,11 @@ def generate_request_str():
 	return render_template("generate.html", generated_url=generated_url)
 
 
-
-
-
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
 	"""This route is required to serve up files from the uploads folder."""
 	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 
 @app.route('/user/<int:id>')
 def user_page(id):
@@ -162,8 +158,6 @@ def user_page(id):
 	user = User.query.get(id)
 
 	return render_template("user_page.html", user=user)
-
-
 
 
 @app.route('/request/<string:id>', methods=['GET', 'POST'])
@@ -182,6 +176,9 @@ def requested_audio_page(id):
 
 		desc = request.form.get('desc')
 		print 'DESC: ', desc
+
+		transcript = request.form.get('transcript')
+		print 'TRANSCRIPT: ', transcript
 
 		# if file and is_allowed_file(file.filename):
 		# 	filename = secure_filename(file.filename)

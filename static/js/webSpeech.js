@@ -199,9 +199,7 @@ email_info.style.display = 'inline-block';
 showInfo('');
 }
 function startButton(event) {
-alert('start button');
 if (recognizing) {
-  alert('start button recognizing');
   recognition.stop();
   return;
 }

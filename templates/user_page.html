@@ -5,30 +5,35 @@
     <ul>
       <li>{{ user.email }}</li>
       <li><a href="/record-loggedin">Record something!</a>
+      <li><a href="/generate">Generate a request for a recording!</a>
     </ul>
 
     {% if user.uploads %}
     <h2>All My Files</h2>
-    <ul>
-    	{% for upload in user.uploads %}
-    		<li>
-				<audio controls>
-					<source src="/uploads/{{ upload.path }}" type="audio/wav">
-				</audio>
-
-    			<p><a href="/uploads/{{ upload.path }}">
-                    {% if upload.title != 'Untitled' %}
-                        {{ upload.title }}
-                    {% else %}
-                        {{ upload.path }}
-                    {% endif %}
-                    </a></p>
-                {% if upload.description %}
-                <p>{{ upload.description }}</p>
-                {% endif %}
-    		</li>
-    	{% endfor %}
-    </ul>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Play!</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Filename</th>
+        </tr>
+        </thead>
+        <tbody> 
+        {% for upload in user.uploads %}
+        <tr>
+            <td>
+                <audio controls>
+                    <source src="/uploads/{{ upload.path }}" type="audio/wav">
+                </audio>
+            </td>
+            <td>{{ upload.title }}</td>
+            <td>{{ upload.description }}</td>
+            <td>{{ upload.path }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     {% endif %}
 
 {% endblock %}

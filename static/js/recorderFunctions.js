@@ -47,12 +47,15 @@ function createDownloadLink() {
     recordingslist.appendChild(li);
 
     var form = new FormData();
-    var reqID = $( '#request-id' ).html();
 
     form.append('file', blob, hf.download);
-    
+
+
     $('#submit-audio').click(function() {
       
+      var myTranscript = encodeURI(final_transcript.substring(n + 1));
+      alert(myTranscript);
+    
       form.append('title', $('#recording-title').val());
       form.append('desc', $('#recording-desc').val());
 
@@ -60,7 +63,7 @@ function createDownloadLink() {
       console.log('this is form: ' + form);
       $.ajax({
         type: 'POST',
-        url: '/request/' + reqID,
+        url: '/record-loggedin',
         data: form,
         cache: false,
         processData: false,

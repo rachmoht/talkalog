@@ -1,51 +1,29 @@
 {% extends 'base.html' %}
-{% block content %}
-
-    <h2>Request #: <span id="request-id">{{ requested_obj.id }}</span></h2>
-    <ul>
-      <li>User that made request: {{ requested_obj.user_id }}</li>
-      <li>Upload ID associated: {{ requested_obj.upload_id }}</li>
-    </ul>
-
-<style type='text/css'>
-    ul { list-style: none; }
-    #recordingslist audio { display: block; margin-bottom: 10px; }
-
-  #info {
-    font-size: 20px;
-    text-align: center;
-    color: #777;
-    visibility: hidden;
-  }
-  #results {
-    font-size: 14px;
-    font-weight: bold;
-    border: 1px solid #ddd;
-    padding: 15px;
-    text-align: left;
-    min-height: 150px;
-  }
-  #start_button {
-    border: 0;
-    background-color:transparent;
-    padding: 0;
-  }
-</style>
-
+{% block imports %}
 <script src="/static/js/recorder.js"></script>
 <script src="/static/js/requestFunctions.js"></script>
+{% endblock %}
+
+{% block content %}
+<h2>Request #: <span id="request-id">{{ requested_obj.id }}</span></h2>
+<ul>
+  <li>User that made request: {{ requested_obj.user_id }}</li>
+  <li>Upload ID associated: {{ requested_obj.upload_id }}</li>
+</ul>
 
 <h1>Record</h1>
 <button onclick="startRecording(this); startButton(event);" id="start_button">record</button>
-<button onclick="stopRecording(this);" disabled>stop</button>
+<button onclick="stopRecording(this); startButton(event);" disabled>stop</button>
 
 <div id="info">
 </div>
+
 <div id="results">
   <span id="final_span" class="final"></span>
   <span id="interim_span" class="interim"></span>
   <p>
 </div>
+
 <div class="center">
   <div id="div_language">
     <select id="select_language" onchange="updateCountry()"></select>
