@@ -49,7 +49,7 @@ class Upload(db.Model):
         self.id, self.user_id, self.title, self.description, self.path, self.mimetype)
 
 
-class RequestURLs(db.Model):
+class RequestURL(db.Model):
     """Request URLs: id will be a unique hashed string associated
     with one user account. When a file is recorded at that page,
     path is then stored in Uploads and associated with user id."""

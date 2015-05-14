@@ -23,6 +23,9 @@
                         {{ upload.path }}
                     {% endif %}
                     </a></p>
+                {% if upload.description %}
+                <p>{{ upload.description }}</p>
+                {% endif %}
     		</li>
     	{% endfor %}
     </ul>
