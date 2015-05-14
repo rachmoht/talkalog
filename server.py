@@ -72,13 +72,17 @@ def record_user_audio_test():
 
 		if request.method == 'POST':
 			flash('Saved file!')
-			print 'is there a file attached? ', request.files
+			print 'is there a file attached? ', request.files # gets the ImmutableMultiDict for files
+			print 'request form: ', request.form # gets the ImmutableMultiDict for info
+			print 'more things, like the title: ', request.form.get('title')
 			file = request.files['file']
+			title = request.form.get('title')
+			desc = request.form.get('desc')
 			print file
 
 			if file and is_allowed_file(file.filename):
 				filename = secure_filename(file.filename)
-				new_recording = Upload(user_id=user.id, title='Untitled', description='Testing',
+				new_recording = Upload(user_id=user.id, title=title, description=desc,
 					path=filename)
 				print 'Created new recording ', new_recording
 				db.session.add(new_recording)

@@ -16,7 +16,13 @@
 					<source src="/uploads/{{ upload.path }}" type="audio/wav">
 				</audio>
 
-    			<p><a href="/uploads/{{ upload.path }}">{{ upload.path }}</a></p>
+    			<p><a href="/uploads/{{ upload.path }}">
+                    {% if upload.title != 'Untitled' %}
+                        {{ upload.title }}
+                    {% else %}
+                        {{ upload.path }}
+                    {% endif %}
+                    </a></p>
     		</li>
     	{% endfor %}
     </ul>
