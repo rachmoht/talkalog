@@ -2,25 +2,38 @@
 <html>
 <head>
 	<title>{% block title %}Audio Project{% endblock %}</title>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css"/>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+
 	<script src="http://code.jquery.com/jquery.js"></script>
+  {% block imports %}{% endblock %}
 </head>
 <body>
-	{% if 'email' in session %}
-        <a href='/logout'>Logout </a>
-    {% else %}
-        <a href='/login'> Login </a>
-        <a href='/signup'>Sign Up</a>
-    {% endif %}
+  <div class="navbar navbar-static-top">
+    <div class="container">
+      <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            {% if 'email' in session %}
+              <li><a href='/logout'>Logout </a></li>
+            {% else %}
+              <li><a href='/login'> Login </a></li>
+              <li><a href='/signup'>Sign Up</a></li>
+            {% endif %}
+          </ul>
+    </div>
+  </div>
 
-	<!-- Show flashed messages -->
+  <div class="container">
+    <!-- Show flashed messages -->
     {% with messages = get_flashed_messages() %}
       {% for message in messages %}
           <div class="alert alert-warning">{{ message }}</div>
       {% endfor %}
     {% endwith %}
 
-	{% block content %}
-		Content here.
-	{% endblock %}
+  	{% block content %}
+  		<!-- Content here -->
+  	{% endblock %}
+  </div>
 </body>
 </html>

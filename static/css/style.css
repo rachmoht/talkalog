@@ -1,0 +1,19 @@
+#recordingslist audio { 
+  display: block; margin-bottom: 10px; 
+}
+
+#info {
+  font-size: 20px;
+  text-align: center;
+  color: #777;
+  visibility: hidden;
+}
+
+#results {
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid #ddd;
+  padding: 15px;
+  text-align: left;
+  min-height: 150px;
+}

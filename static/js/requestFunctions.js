@@ -47,14 +47,17 @@ function createDownloadLink() {
     recordingslist.appendChild(li);
 
     var form = new FormData();
-    var reqID = $( '#request-id' ).html();
+    var reqID = $( '#request-id' ).html();    
 
     form.append('file', blob, hf.download);
     
+    
     $('#submit-audio').click(function() {
+      var myTranscript = $( '#final_span' ).html();
       
       form.append('title', $('#recording-title').val());
       form.append('desc', $('#recording-desc').val());
+      form.append('transcript', myTranscript);
 
       alert('Submitting!');
       console.log('this is form: ' + form);
