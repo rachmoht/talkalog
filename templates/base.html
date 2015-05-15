@@ -2,7 +2,15 @@
 <html>
 <head>
 	<title>{% block title %}Audio Project{% endblock %}</title>
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css"/>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
   <link rel="stylesheet" href="/static/css/style.css"/>
 
 	<script src="http://code.jquery.com/jquery.js"></script>
@@ -14,10 +22,11 @@
       <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             {% if 'email' in session %}
-              <li><a href='/logout'>Logout </a></li>
+              <li><a href="/profile">Profile</a></li>
+              <li><a href="/logout">Logout</a></li>
             {% else %}
-              <li><a href='/login'> Login </a></li>
-              <li><a href='/signup'>Sign Up</a></li>
+              <li><a href="/login">Login</a></li>
+              <li><a href="/signup">Sign Up</a></li>
             {% endif %}
           </ul>
     </div>

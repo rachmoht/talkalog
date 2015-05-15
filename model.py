@@ -2,6 +2,8 @@
 
 from flask_sqlalchemy import SQLAlchemy
 
+from datetime import datetime 
+
 # Connection to the SQLite database via Flask-SQLAlchemy helper library. 
 # On this, we can find the `session` object.
 
@@ -36,17 +38,18 @@ class Upload(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
     title = db.Column(db.String, nullable=False, default='Untitled')
-    description = db.Column(db.String)
     path = db.Column(db.String(50))
     mimetype = db.Column(db.String(50), default='wav') # wav, jpg, mp3
+    datetime = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now()) # set datetime to current timestamp
+    transcript = db.Column(db.Text)
 
     user = db.relationship("User", backref=db.backref("uploads", order_by=id))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Upload id: %s user_id: %s title: %s description: %s path: %s mimetype: %s>" % (
-        self.id, self.user_id, self.title, self.description, self.path, self.mimetype)
+        return "<Upload id: %s user_id: %s title: %s path: %s mimetype: %s datetime: %s transcript: %s>" % (
+        self.id, self.user_id, self.title, self.path, self.mimetype, self.datetime, self.transcript)
 
 
 class RequestURL(db.Model):
@@ -61,6 +64,7 @@ class RequestURL(db.Model):
     upload_id = db.Column(db.Integer, db.ForeignKey('Uploads.id'), nullable=False)
 
     user = db.relationship("User", backref=db.backref("requesturls", order_by=id))
+    upload = db.relationship("Upload", backref=db.backref("requesturls", order_by=id))
 
     def __repr__(self):
         """Provide helpful representation when printed."""

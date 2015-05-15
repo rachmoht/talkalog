@@ -4,7 +4,7 @@
     <h2>User {{ user.id }}</h2>
     <ul>
       <li>{{ user.email }}</li>
-      <li><a href="/record-loggedin">Record something!</a>
+      <li><a href="/record">Record something!</a>
       <li><a href="/generate">Generate a request for a recording!</a>
     </ul>
 
@@ -15,8 +15,8 @@
         <tr>
             <th>Play!</th>
             <th>Title</th>
-            <th>Description</th>
             <th>Filename</th>
+            <th>Transcript</th>
         </tr>
         </thead>
         <tbody> 
@@ -28,8 +28,8 @@
                 </audio>
             </td>
             <td>{{ upload.title }}</td>
-            <td>{{ upload.description }}</td>
             <td>{{ upload.path }}</td>
+            <td>{{ upload.transcript }}</td>
         </tr>
         {% endfor %}
         </tbody>

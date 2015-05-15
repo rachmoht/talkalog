@@ -43,30 +43,9 @@ def is_allowed_file(filename):
 		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/record', methods=['GET', 'POST'])
-def record_audio_test():
+def record_audio():
 	"""Record audio. Capture data and be able to callback."""
-	print 'GET method on record-test'
 
-	if request.method == 'POST':
-		flash('Saved file!')
-		print 'is there a file attached? ', request.files
-		file = request.files['file']
-		print file
-		if file and is_allowed_file(file.filename):
-			filename = secure_filename(file.filename)
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-			return redirect('/')
-	else: 
-		return render_template("record.html")
-
-
-
-@app.route('/record-loggedin', methods=['GET', 'POST'])
-def record_user_audio_test():
-	"""Record audio. Capture data and be able to callback."""
-	print 'GET method on record-test'
-	
 	if "email" in session: #if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
@@ -79,13 +58,12 @@ def record_user_audio_test():
 			print 'more things, like the title: ', request.form.get('title')
 			file = request.files['file']
 			title = request.form.get('title')
-			desc = request.form.get('desc')
+			transcript = request.form.get('transcript')
 			print file
 
 			if file and is_allowed_file(file.filename):
 				filename = secure_filename(file.filename)
-				new_recording = Upload(user_id=user.id, title=title, description=desc,
-					path=filename)
+				new_recording = Upload(user_id=user.id, title=title, path=filename, transcript=transcript)
 				print 'Created new recording ', new_recording
 				db.session.add(new_recording)
 				print 'Adding new recording'
@@ -94,11 +72,14 @@ def record_user_audio_test():
 
 				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
+				flash('Memo successfully recorded!')
+				return redirect('/profile')
+
+		return render_template("record.html")
+
 	else:
 		flash('You must be logged in to save recording')
 		return redirect('/login')
-
-	return render_template("record-test.html")
 
 
 def id_generator(size=20, chars=string.ascii_uppercase + string.digits):
@@ -118,8 +99,11 @@ def generate_request_str():
 		if request.method == 'POST':
 			request_str = id_generator()
 			print 'Generated request string', request_str
+		
+			title = request.form.get('title')
+			print 'This is the title: ', title
 
-			new_upload_placeholder = Upload(user_id=user.id)
+			new_upload_placeholder = Upload(user_id=user.id, title=title)
 
 			db.session.add(new_upload_placeholder)
 			db.session.commit()
@@ -152,12 +136,19 @@ def uploaded_file(filename):
 	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
-@app.route('/user/<int:id>')
-def user_page(id):
+@app.route('/profile')
+def user_page():
 	"""Show more information about the single user logged in."""
-	user = User.query.get(id)
 
-	return render_template("user_page.html", user=user)
+	if "email" in session: #if logged in
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+
+		return render_template("user_page.html", user=user)
+
+	else:
+		flash('You must be logged in to view files')
+		return redirect('/login')
 
 
 @app.route('/request/<string:id>', methods=['GET', 'POST'])
@@ -174,27 +165,21 @@ def requested_audio_page(id):
 		title = request.form.get('title')
 		print 'TITLE: ', title
 
-		desc = request.form.get('desc')
-		print 'DESC: ', desc
-
 		transcript = request.form.get('transcript')
 		print 'TRANSCRIPT: ', transcript
 
-		# if file and is_allowed_file(file.filename):
-		# 	filename = secure_filename(file.filename)
-		# 	new_recording = Upload(user_id=user.id, title=title, description=desc,
-		# 		path=filename)
-		# 	print 'Created new recording ', new_recording
-		# 	db.session.add(new_recording)
-		# 	print 'Adding new recording'
-		# 	db.session.commit()
-		# 	print 'Committed new recording %s' % filename
+		if file and is_allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			assoc_upload.title = title
+			assoc_upload.path = filename
+			assoc_upload.transcript = transcript
 
-		# 	file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			print 'NEW assoc upload: ', assoc_upload
 
+			db.session.commit()
+			print 'Committed new recording %s' % filename
 
-
-
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 	return render_template("request_page.html", requested_obj=requested_obj)
 

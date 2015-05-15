@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<h2>Request #: <span id="request-id">{{ requested_obj.id }}</span></h2>
+<h2>Request #<span id="request-id">{{ requested_obj.id }}</span> for {{ requested_obj.upload.title }}</h2>
 <ul>
   <li>User that made request: {{ requested_obj.user_id }}</li>
   <li>Upload ID associated: {{ requested_obj.upload_id }}</li>
@@ -39,11 +39,8 @@
 <pre id="log"></pre>
 
 <div class="upload-info">
-  <label>Title: 
+  <label>Update Title: 
     <input type="text" name="recording-title" id="recording-title">
-  </label><br>
-  <label>Description: 
-    <textarea name="recording-desc" id="recording-desc"></textarea>
   </label>
   <input type="submit" value="submit audio" id="submit-audio">
 </div>

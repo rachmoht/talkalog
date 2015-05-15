@@ -3,7 +3,10 @@
 
     <h2>Request a Recording</h2>
     <form action="/generate" method="POST">
-      <input type="submit" value="Generate a request URL!">
+    	<label>Title: 
+    		<input type="text" name="title">
+    	</label>
+    	<input type="submit" value="Generate a request URL!">
     </form>
 
     {% if generated_url %}
