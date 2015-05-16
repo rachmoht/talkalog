@@ -81,15 +81,14 @@ class Collection(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
     title = db.Column(db.String, nullable=False, default='Untitled Collection')
-    description = db.Column(db.String)
 
     user = db.relationship("User", backref=db.backref("collections", order_by=id))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Collection id: %s user_id: %s title: %s description: %s>" % (
-        self.id, self.user_id, self.title, self.description)
+        return "<Collection id: %s user_id: %s title: %s>" % (
+        self.id, self.user_id, self.title)
 
 
 class CollectionsUsers(db.Model):
@@ -98,7 +97,7 @@ class CollectionsUsers(db.Model):
 
     __tablename__ = "CollectionsUsers"
 
-    id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     collection_id = db.Column(db.Integer, db.ForeignKey('Collections.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
 
@@ -118,7 +117,7 @@ class CollectionsUploads(db.Model):
 
     __tablename__ = "CollectionsUploads"
 
-    id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     collection_id = db.Column(db.Integer, db.ForeignKey('Collections.id'), nullable=False)
     upload_id = db.Column(db.Integer, db.ForeignKey('Uploads.id'), nullable=False)
 
@@ -128,8 +127,8 @@ class CollectionsUploads(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<CollectionsUsers id: %s collection_id: %s user_id: %s>" % (
-        self.id, self.collection_id, self.user_id)
+        return "<CollectionsUsers id: %s collection_id: %s upload_id: %s>" % (
+        self.id, self.collection_id, self.upload_id)
 
 
 # Helper functions
