@@ -31,8 +31,13 @@ app.jinja_env.undefined = StrictUndefined
 
 @app.route('/')
 def index():
-    """Home."""
-    return render_template("homepage.html")
+	"""Home."""
+	if "email" in session: 
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+		return redirect('/profile')
+	else:
+		return render_template("homepage.html")
 
 
 # Start of Recording
@@ -42,11 +47,12 @@ def is_allowed_file(filename):
 	return '.' in filename and \
 		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+
 @app.route('/record', methods=['GET', 'POST'])
 def record_audio():
 	"""Record audio. Capture data and be able to callback."""
 
-	if "email" in session: #if logged in
+	if "email" in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 		print 'User: ', user
@@ -92,7 +98,7 @@ def generate_request_str():
 
 	generated_url = False
 
-	if "email" in session: #if logged in
+	if "email" in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
@@ -140,11 +146,41 @@ def uploaded_file(filename):
 def user_page():
 	"""Show more information about the single user logged in."""
 
-	if "email" in session: #if logged in
+	if "email" in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
-		return render_template("user_page.html", user=user)
+		return render_template("profile.html", user=user)
+
+	else:
+		flash('You must be logged in to view files')
+		return redirect('/login')
+
+
+@app.route('/add/<int:id>', methods=['GET', 'POST'])
+def add_to_collection(id):
+	"""Add an existing upload to a collection."""
+	print 'ADD TO COLLECTION *************'
+	upload_id = id
+	if "email" in session: # if logged in
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+
+		this_collection = request.form['collection']
+		existing_collection = Collection.query.filter_by(title=this_collection, user_id=user.id).first()
+
+		if existing_collection == None: # if no collection exists of the same name from this user, create one
+			new_collection = Collection(title=this_collection, user_id=user.id)
+			db.session.add(new_collection)
+			db.session.commit()
+			print 'Added new collection to db: ', new_collection
+
+			add_this_upload = CollectionsUploads(collection_id=new_collection.id, upload_id=upload_id)
+			db.session.add(add_this_upload)
+			db.session.commit()
+			print 'Added new upload to collection: ', add_this_upload
+
+			return redirect('/profile')
 
 	else:
 		flash('You must be logged in to view files')
@@ -201,15 +237,20 @@ def login_process():
 	entered_pw = request.form['password']
 
 	user = User.query.filter_by(email=entered_email).first()
-
-	if entered_pw == user.password:
-		session['email'] = request.form['email']
-		print 'Session: ', session
-		flash('You successfully logged in as %s!' % session['email'])
-		return redirect("/user/%s" % user.id)
+	
+	if user != None:
+		if entered_pw == user.password:
+			session['email'] = request.form['email']
+			print 'Session: ', session
+			flash('You successfully logged in as %s!' % session['email'])
+			return redirect("/profile")
+		else:
+			flash("That is not the correct password!")
+			return redirect('/login')
 	else:
-		flash("That is not the correct password!")
-		return redirect('/login')
+		flash("No existing account for %s" % entered_email)
+		return redirect('/signup')
+
 
 
 @app.route('/signup')
