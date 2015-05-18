@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h2>User {{ user.id }}</h2>
+    <ul>
+      <li>{{ user.email }}</li>
+      <li><a href="/record">Record something!</a>
+      <li><a href="/generate">Generate a request for a recording!</a>
+    </ul>
+
+    {% if user.uploads %}
+    <h2>All My Files</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Transcript</th>
+            <th>Collection</th>
+        </tr>
+        </thead>
+        <tbody> 
+        {% for upload in user.uploads %}
+        <tr>
+            <td><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></td>
+            <td>{{ upload.transcript }}</td>
+            <td>
+                {% if upload.collectionsuploads %}
+                    {% for upcollect in upload.collectionsuploads %}
+                        {{ upcollect.collection.title }}
+                    {% endfor %}
+                {% else %}
+                    <form action="/add/{{ upload.id }}" method="POST">
+                        <label>Collection: 
+                            <input type="text" name="collection">
+                        </label>
+                        <input type="submit" value="Save Collection">
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if user.collections %}
+    <h2>All My Collections</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Sharing</th>
+        </tr>
+        </thead>
+        <tbody> 
+        {% for collection in user.collections %}
+        <tr>
+            <td>{{ collection.title }}</td>
+            <td>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#share-{{ collection.id }}">
+                  Share
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="share-{{ collection.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">Share {{ collection.title }}</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/share/{{ collection.id }}" method="POST">
+                                    <label>Enter email for sharing: 
+                                        <input type="text" name="email">
+                                    </label>
+                                    <input type="submit" value="Share Collection">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if user.collectionsusers %}
+    <h2>Collections Shared With Me</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Title</th>
+        </tr>
+        </thead>
+        <tbody> 
+        {% for collection in user.collectionsusers %}
+        <tr>
+            <td>{{ collection.collection.title }}</td>
+            
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+{% endblock %}

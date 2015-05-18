@@ -4,7 +4,6 @@
 	<title>{% block title %}Audio Project{% endblock %}</title>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
   <link rel="stylesheet" href="/static/css/style.css"/>
 
   <script src="http://code.jquery.com/jquery.js"></script>
@@ -16,15 +15,16 @@
   <div class="navbar navbar-static-top">
     <div class="container">
       <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            {% if 'email' in session %}
-              <li><a href="/profile">Profile</a></li>
-              <li><a href="/logout">Logout</a></li>
-            {% else %}
-              <li><a href="/login">Login</a></li>
-              <li><a href="/signup">Sign Up</a></li>
-            {% endif %}
-          </ul>
+        <ul class="nav navbar-nav navbar-right">
+          {% if 'email' in session %}
+            <li><a href="/profile">Profile</a></li>
+            <li><a href="/logout">Logout</a></li>
+          {% else %}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/signup">Sign Up</a></li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
   </div>
 

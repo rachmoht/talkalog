@@ -67,6 +67,7 @@ function createDownloadLink() {
         contentType: false,
       }).done(function(data) {
         console.log(data);
+        window.location.href = "/profile";
       });
     });
 
