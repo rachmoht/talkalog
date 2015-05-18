@@ -28,7 +28,6 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
-
 @app.route('/')
 def index():
 	"""Home."""
@@ -157,6 +156,26 @@ def user_page():
 		return redirect('/login')
 
 
+@app.route('/listen/<int:id>')
+def listen_audio(id):
+	"""Show more information about the single user logged in."""
+
+	if "email" in session: # if logged in
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+		print "User ID of this user: ", user.id
+
+		this_file = Upload.query.filter_by(id=id).first()
+		print "User ID of this file: ", this_file.id
+
+		if this_file.user_id == user.id:
+			return render_template('listen.html', user=user, upload=this_file)
+
+		else:
+			flash('You don\'t have access to view this page')
+			return redirect('/')
+
+
 @app.route('/add/<int:id>', methods=['GET', 'POST'])
 def add_to_collection(id):
 	"""Add an existing upload to a collection."""
@@ -182,10 +201,49 @@ def add_to_collection(id):
 
 			return redirect('/profile')
 
+		else: # associate this upload to the already existing collection
+			print 'Existing collection id: ', existing_collection.id
+			print 'Upload id: ', upload_id
+			add_this_upload = CollectionsUploads(collection_id=existing_collection.id, upload_id=upload_id)
+			db.session.add(add_this_upload)
+			db.session.commit()
+			print 'Add this upload to existing collection: ', add_this_upload
+
+			return redirect('/profile')
+
 	else:
 		flash('You must be logged in to view files')
 		return redirect('/login')
 
+
+@app.route('/share/<int:id>', methods=['GET', 'POST'])
+def share_collection(id):
+	"""Share a collection with another user by email address."""
+	print 'SHARING COLLECTION *************'
+
+	collection_id = id
+
+	if "email" in session: # if logged in
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+
+		other_user_email = request.form['email']
+		other = User.query.filter_by(email=other_user_email).first()
+		print 'Other user to share with: ', other
+
+		if other == None: # if no user exists
+			flash('No user currently exists with this email.')
+			return redirect('/profile')
+
+		else:
+			shared_with_user = CollectionsUsers(collection_id=collection_id, user_id=other.id)
+			db.session.add(shared_with_user)
+			db.session.commit()
+			print 'Added new user to collection: ', shared_with_user
+
+			flash('Shared with %s' % other.email)
+			return redirect('/profile')
+			
 
 @app.route('/request/<string:id>', methods=['GET', 'POST'])
 def requested_audio_page(id):

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h2>User {{ user.id }}</h2>
+
+    <hr>
+    
+    <h2>{{ upload.title }}</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Play</th>
+            <th>Transcript</th>
+            <th>Collection</th>
+        </tr>
+        </thead>
+        <tbody> 
+        <tr>
+            <td>
+                <audio controls>
+                    <source src="/uploads/{{ upload.path }}" type="audio/wav">
+                </audio>
+            </td>
+            <td>{{ upload.transcript }}</td>
+            <td>
+                {% if upload.collectionsuploads %}
+                    {% for upcollect in upload.collectionsuploads %}
+                        {{ upcollect.collection.title }}
+                    {% endfor %}
+                {% else %}
+                    <form action="/add/{{ upload.id }}" method="POST">
+                        <label>Collection: 
+                            <input type="text" name="collection">
+                        </label>
+                        <input type="submit" value="Save Collection">
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+{% endblock %}
