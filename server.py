@@ -36,7 +36,7 @@ def index():
 		user = User.query.filter_by(email=user_email).first()
 		return redirect('/profile')
 	else:
-		return render_template("homepage.html")
+		return render_template('homepage.html')
 
 
 # Start of Recording
@@ -80,11 +80,25 @@ def record_audio():
 				flash('Memo successfully recorded!')
 				return redirect('/profile')
 
-		return render_template("record.html")
+		return render_template('record.html')
 
 	else:
 		flash('You must be logged in to save recording')
 		return redirect('/login')
+
+
+@app.route('/success')
+def success_message_record():
+	"""Flash a success message and redirect to user profile at submit."""
+	flash('Recording successfully submitted!')
+	return redirect('/profile')
+
+
+@app.route('/thanks')
+def thanks_message_request():
+	"""Flash a success message and redirect to thank you page with info."""
+	flash('Recording successfully submitted!')
+	return render_template('thanks.html')
 
 
 def id_generator(size=20, chars=string.ascii_uppercase + string.digits):
@@ -168,6 +182,17 @@ def listen_audio(id):
 		this_file = Upload.query.filter_by(id=id).first()
 		print "User ID of this file: ", this_file.id
 
+		# check if upload belongs to a collection,
+		# to check if other users have permission for collection
+		# other users inherit the permission for individual audio file
+		parent_collections = this_file.collectionsuploads
+		print "*******This upload belongs to: ", parent_collections
+
+		# from collections uploads, get collection id
+		# from collection id, find collectionsusers
+		# from collectionsusers find all users
+		# check if logged in user id is in this list for access
+		
 		if this_file.user_id == user.id:
 			return render_template('listen.html', user=user, upload=this_file)
 
@@ -226,6 +251,7 @@ def add_to_collection(id):
 			db.session.commit()
 			print 'Added new upload to collection: ', add_this_upload
 
+			flash('Successfully added to collection')
 			return redirect('/profile')
 
 		else: # associate this upload to the already existing collection
@@ -235,6 +261,8 @@ def add_to_collection(id):
 			db.session.add(add_this_upload)
 			db.session.commit()
 			print 'Add this upload to existing collection: ', add_this_upload
+			
+			flash('Successfully added to collection')
 
 			return redirect('/profile')
 

@@ -127,7 +127,7 @@ class CollectionsUploads(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<CollectionsUsers id: %s collection_id: %s upload_id: %s>" % (
+        return "<CollectionsUploads id: %s collection_id: %s upload_id: %s>" % (
         self.id, self.collection_id, self.upload_id)
 
 
