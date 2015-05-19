@@ -24,8 +24,8 @@
             <td>{{ upload.transcript }}</td>
             <td>
                 {% if upload.collectionsuploads %}
-                    {% for upcollect in upload.collectionsuploads %}
-                        {{ upcollect.collection.title }}
+                    {% for uc in upload.collectionsuploads %}
+                        <a href="/collection/{{ uc.collection.id }}">{{ uc.collection.title }}</a>
                     {% endfor %}
                 {% else %}
                     <form action="/add/{{ upload.id }}" method="POST">

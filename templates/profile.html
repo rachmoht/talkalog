@@ -55,7 +55,7 @@
         <tbody> 
         {% for collection in user.collections %}
         <tr>
-            <td>{{ collection.title }}</td>
+            <td><a href="/collection/{{ collection.id }}">{{ collection.title }}</a></td>
             <td>
                 <!-- Button trigger modal -->
                 <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#share-{{ collection.id }}">
@@ -99,7 +99,7 @@
         <tbody> 
         {% for collection in user.collectionsusers %}
         <tr>
-            <td>{{ collection.collection.title }}</td>
+            <td><a href="/collection/{{ collection.collection.id }}">{{ collection.collection.title }}</a></td>
             
         </tr>
         {% endfor %}

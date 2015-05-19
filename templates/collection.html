@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h2>User {{ user.id }}</h2>
+
+    <hr>
+    
+    <h2>{{ collection.title }}</h2>
+    {% if uploads %}
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Transcript</th>
+                <th>Owner</th>
+            </tr>
+            </thead>
+            <tbody> 
+            {% for upload in uploads %}
+                <tr>
+                    <td><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></td>
+                    <td>{{ upload.transcript }}</td>
+                    <td>{{ upload.user.first_name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endblock %}

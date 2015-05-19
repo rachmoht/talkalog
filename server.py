@@ -176,6 +176,33 @@ def listen_audio(id):
 			return redirect('/')
 
 
+@app.route('/collection/<int:id>')
+def collection_page(id):
+	"""Show more information about a collection."""
+
+	if "email" in session: # if logged in
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+		print "User ID of this user: ", user.id
+
+		this_collection = Collection.query.filter_by(id=id).first()
+		print "This collection: ", this_collection
+
+		uploads = [cu.upload for cu in this_collection.collectionsuploads]
+		print "This collection's uploads: ", uploads
+
+		print "CollectionsUsers before query: ", this_collection.collectionsusers
+
+		collectionusers = CollectionsUsers.query.filter_by(collection_id=id).all()
+		print "This collection to user relationship: ", collectionusers
+
+		return render_template('collection.html', user=user, collection=this_collection, uploads=uploads)
+
+	else:
+		flash('You don\'t have access to view this page')
+		return redirect('/')
+
+
 @app.route('/add/<int:id>', methods=['GET', 'POST'])
 def add_to_collection(id):
 	"""Add an existing upload to a collection."""
