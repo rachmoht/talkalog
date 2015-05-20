@@ -1,4 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Audio Project</h1>
+	<div class="jumbotron">
+	    <h1>Audio Project</h1>
+	    <form action="/login-process" method="POST">
+	    	<div class="form-group">
+				<label>Email: 
+				<input type="email" class="form-control" name="email" placeholder="name@domain.com">
+				</label>
+	    	</div>
+	    	<div class="form-group">
+				<label>Password:
+				<input type="password" class="form-control" name="password">
+				</label>
+			</div>
+			<input type="submit" value="Log In" class="btn btn-default btn-lg">
+	    </form>
+	</div>
 {% endblock %}

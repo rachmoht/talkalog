@@ -1,5 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
+    <style>
+        #draggable { width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 0; }
+        #droppable { width: 150px; height: 150px; padding: 0.5em; float: left; margin: 10px; }
+        .drag-drop {
+        background: url(/static/img/drag-drop.png);
+        vertical-align: middle;
+        height: 41px;
+        width: 16px;
+        margin: 0 5px;
+        }
+        .drag-drop:hover {
+        cursor: -webkit-grab;
+        }
+    </style>
+    <script>
+        $(function() {
+            var draggable = $( ".draggable" );
+            draggable =  _.isArray(draggable) ?
+                draggable : [draggable];
+            _.each(draggable, function(item){
+                item.draggable();
+            })
+            
+            var droppable = $( ".droppable");
+            droppable = _.isArray(droppable) ?
+                droppable : [droppable];
+
+            _.each(droppable, function(item){
+                item.droppable({
+                    drop: function (event, ui){
+                        var uploadId = ui.draggable.attr('upload-id');
+                        console.log('Upload ID: ' + uploadId);
+
+                        var collectionId = event.target.attributes['collection-id'].value;
+                        console.log('Collection ID: ' + collectionId);
+
+                        // TODO: add uploadId -> collectionId
+                        // TODO: when done - refresh the page 
+                        var v = 123;
+                    }
+                });
+            })
+        });
+    </script>
 
     <h2>User {{ user.id }}</h2>
     <ul>
@@ -20,7 +64,8 @@
         </thead>
         <tbody> 
         {% for upload in user.uploads %}
-        <tr>
+        <tr class="draggable" upload-id="{{ upload.id }}">
+            <td><div class="drag-drop"/></td>
             <td><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></td>
             <td>{{ upload.transcript }}</td>
             <td>
@@ -54,7 +99,7 @@
         </thead>
         <tbody> 
         {% for collection in user.collections %}
-        <tr>
+        <tr class="droppable" collection-id='{{ collection.id }}'>
             <td><a href="/collection/{{ collection.id }}">{{ collection.title }}</a></td>
             <td>
                 <!-- Button trigger modal -->

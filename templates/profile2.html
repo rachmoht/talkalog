@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script>
+        $(function() {
+            var draggable = $( ".draggable" );
+            draggable =  _.isArray(draggable) ?
+                draggable : [draggable];
+            _.each(draggable, function(item){
+                item.draggable();
+            })
+            
+            var droppable = $( ".droppable");
+            droppable = _.isArray(droppable) ?
+                droppable : [droppable];
+
+            _.each(droppable, function(item){
+                item.droppable({
+                    drop: function (event, ui){
+                        var uploadId = ui.draggable.attr('upload-id');
+                        console.log('Upload ID: ' + uploadId);
+
+                        var collectionId = event.target.attributes['collection-id'].value;
+                        console.log('Collection ID: ' + collectionId);
+
+                        // TODO: add uploadId -> collectionId
+                        // TODO: when done - refresh the page 
+                        var v = 123;
+                        $.ajax({
+                            url: "/add-to-collection/"+uploadId +"",
+                            type: "POST",
+                            data: {
+                                'upload_id': uploadId,
+                                'collection_id': collectionId 
+                            } 
+                        }).done(function(data) {
+                            console.log(data);
+                            window.location.href = "/success-collection";
+                        });
+                    }
+                });
+            })
+        });
+    </script>
+
+    <h2>Welcome, {{ user.first_name }}</h2>
+    <p>{{ user.first_name }} {{ user.last_name }} | User ID: {{ user.id }} | {{ user.email }}</p>
+
+    <hr>
+
+    <table class="table">
+        <tbody> 
+            {% if user.collections %}
+                {% for collection in user.collections %}
+                    <tr class="droppable active" collection-id="{{ collection.id }}">
+                        <td></td>
+                        <td><a href="/collection/{{ collection.id }}">{{ collection.title }}</a></td>
+                        <td></td>
+                        <td>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#share-{{ collection.id }}">
+                              Share
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="share-{{ collection.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Share {{ collection.title }}</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="/share/{{ collection.id }}" method="POST">
+                                                <label>Enter email for sharing: 
+                                                    <input type="text" name="email">
+                                                </label>
+                                                <input type="submit" value="Share Collection">
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% for cu in collection.collectionsuploads %}
+                        <tr class="draggable upload" upload-id="{{ cu.upload.id }}">
+                            <td><div class="drag-drop"/></td>
+                            <td><a href="/listen/{{ cu.upload.id }}">{{ cu.upload.title }}</a></td>
+                            <td>{{ cu.upload.transcript }}</td>
+                            <td>Share Social</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+
+    {% if singleuploads %}
+
+    <h5>Unattached Uploads</h5>
+    <table class="table">
+        <tbody> 
+            {% for upload in singleuploads %}
+                <tr class="draggable upload" upload-id="{{ upload.id }}">
+                    <td><div class="drag-drop"/></td>
+                    <td><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></td>
+                    <td>{{ upload.transcript }}</td>
+                    <td>Share Social</td>
+                </tr>                   
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <hr>
+
+    {% if user.collectionsusers %}
+    <h5>Collections Shared With Me</h5>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Title</th>
+        </tr>
+        </thead>
+        <tbody> 
+        {% for collection in user.collectionsusers %}
+        <tr>
+            <td><a href="/collection/{{ collection.collection.id }}">{{ collection.collection.title }}</a></td>
+            
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+{% endblock %}

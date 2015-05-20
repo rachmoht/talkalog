@@ -94,6 +94,13 @@ def success_message_record():
 	return redirect('/profile')
 
 
+@app.route('/success-collection')
+def success_message_upload():
+	"""Flash a success message and redirect to user profile at submit."""
+	flash('Upload added to collection!')
+	return redirect('/profile')
+
+
 @app.route('/thanks')
 def thanks_message_request():
 	"""Flash a success message and redirect to thank you page with info."""
@@ -163,7 +170,31 @@ def user_page():
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
-		return render_template("profile.html", user=user)
+		user_uploads = user.uploads
+		print "user uploads: ", user_uploads
+
+		user_collections = user.collections
+		print "user collections: ", user_collections
+
+		user_cu = []
+
+		for collection in user_collections:
+			cu = collection.collectionsuploads
+			for i in cu:
+				user_cu.append(i.upload_id)
+
+		singleuploads = []
+
+		for i in user_uploads:
+			if i.id not in user_cu:
+				singleuploads.append(i)
+
+		print '**** Unattached uploads: ', singleuploads
+
+		# print "user collectionsuploads: ", user_cu
+
+
+		return render_template("profile2.html", user=user, singleuploads=singleuploads)
 
 	else:
 		flash('You must be logged in to view files')
@@ -269,6 +300,54 @@ def add_to_collection(id):
 	else:
 		flash('You must be logged in to view files')
 		return redirect('/login')
+
+
+@app.route('/add-to-collection/<int:id>', methods=['GET', 'POST'])
+def add_upload_to_collection(id):
+	"""Add an existing upload to a collection."""
+	print 'ADD TO COLLECTION *************'
+	upload_id = request.form.get('upload_id')
+	upload = Upload.query.get(id)
+	print 'Upload id: ', upload_id
+
+	collection_id = request.form.get('collection_id')
+	collection = Collection.query.get(collection_id)
+	print 'Collection id: ', collection_id
+
+	# flash('Successfully added %s to the %s collection' % (upload.title, collection.title))
+
+	return redirect('/profile')
+
+
+
+	# if "email" in session: # if logged in
+	# 	user_email = session['email']
+	# 	user = User.query.filter_by(email=user_email).first()
+
+	# 	this_collection = request.form['collection']
+	# 	existing_collection = Collection.query.filter_by(title=this_collection, user_id=user.id).first()
+
+	# 	if existing_collection == None: # if no collection exists of the same name from this user, not possible
+
+	# 		flash('This is not possible')
+	# 		return redirect('/profile')
+
+	# 	else: # associate this upload to the already existing collection
+	# 		print 'Existing collection id: ', existing_collection.id
+	# 		print 'Upload id: ', upload_id
+	# 		add_this_upload = CollectionsUploads(collection_id=existing_collection.id, upload_id=upload_id)
+	# 		# db.session.add(add_this_upload)
+	# 		# db.session.commit()
+	# 		print 'Add this upload to existing collection: ', add_this_upload
+			
+	# 		flash('Successfully added to collection')
+
+	# 		return redirect('/profile')
+
+	# else:
+	# 	flash('You must be logged in to view files')
+	# 	return redirect('/login')
+
 
 
 @app.route('/share/<int:id>', methods=['GET', 'POST'])

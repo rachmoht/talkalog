@@ -17,3 +17,19 @@
   text-align: left;
   min-height: 150px;
 }
+
+.upload {
+  padding-left: 40px;
+}
+
+.drag-drop {
+  background: url(/static/img/drag-drop.png);
+  vertical-align: middle;
+  height: 41px;
+  width: 16px;
+  margin: 0 5px;
+}
+
+.drag-drop:hover {
+  cursor: -webkit-grab;
+}
