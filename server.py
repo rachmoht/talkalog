@@ -28,10 +28,22 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
+def is_allowed_file(filename):
+	"""Check that file created by audio has allowed extension."""
+	return '.' in filename and \
+		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+	"""Serve up files from the /uploads folder."""
+	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
 @app.route('/')
 def index():
 	"""Home."""
-	if "email" in session: 
+	if 'email' in session: 
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 		return redirect('/profile')
@@ -39,19 +51,42 @@ def index():
 		return render_template('homepage.html')
 
 
-# Start of Recording
-def is_allowed_file(filename):
-	print 'filename: ', filename
-	print '**************'
-	return '.' in filename and \
-		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+@app.route('/profile')
+def user_page():
+	"""Show more information about the single user logged in."""
+
+	if 'email' in session: # if logged in
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+
+		user_uploads = user.uploads
+		user_collections = user.collections
+
+		# create list of user collectionuploads
+		user_cu = []
+		for collection in user_collections:
+			cu = collection.collectionsuploads
+			for i in cu:
+				user_cu.append(i.upload_id)
+
+		# initiate list for upload objects unattached to collection
+		singleuploads = []
+		for i in user_uploads:
+			if i.id not in user_cu:
+				singleuploads.append(i)
+
+		return render_template("profile2.html", user=user, singleuploads=singleuploads)
+
+	else:
+		flash('You must be logged in to view files')
+		return redirect('/login')
 
 
 @app.route('/record', methods=['GET', 'POST'])
 def record_audio():
 	"""Record audio. Capture data and be able to callback."""
 
-	if "email" in session: # if logged in
+	if 'email' in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 		print 'User: ', user
@@ -108,6 +143,7 @@ def thanks_message_request():
 	return render_template('thanks.html')
 
 
+# TODO: where is the best place for function in this file?
 def id_generator(size=20, chars=string.ascii_uppercase + string.digits):
 	return ''.join(random.choice(chars) for _ in range(size))
 
@@ -116,12 +152,14 @@ def id_generator(size=20, chars=string.ascii_uppercase + string.digits):
 def generate_request_str():
 	"""Generate random, unique string for private user associated URLs."""
 
+	# initialize generated_url
 	generated_url = False
 
-	if "email" in session: # if logged in
+	if 'email' in session: 
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
+		# when user submits form, generate string
 		if request.method == 'POST':
 			request_str = id_generator()
 			print 'Generated request string', request_str
@@ -134,15 +172,8 @@ def generate_request_str():
 			db.session.add(new_upload_placeholder)
 			db.session.commit()
 
-			print 'New Upload ID: ', new_upload_placeholder.id
 			new_upload_id = new_upload_placeholder.id
-			print 'Generated new upload id: ', new_upload_id
-			print 'Created new upload placeholder ', new_upload_placeholder
-
-			print 'Adding new new_upload_placeholder'
-
 			new_request_url = RequestURL(id=request_str, user_id=user.id, upload_id=new_upload_id)
-			print 'Created new RequestURL: ', new_request_url
 
 			db.session.add(new_request_url)
 			db.session.commit()
@@ -156,56 +187,11 @@ def generate_request_str():
 	return render_template("generate.html", generated_url=generated_url)
 
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-	"""This route is required to serve up files from the uploads folder."""
-	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
-@app.route('/profile')
-def user_page():
-	"""Show more information about the single user logged in."""
-
-	if "email" in session: # if logged in
-		user_email = session['email']
-		user = User.query.filter_by(email=user_email).first()
-
-		user_uploads = user.uploads
-		print "user uploads: ", user_uploads
-
-		user_collections = user.collections
-		print "user collections: ", user_collections
-
-		user_cu = []
-
-		for collection in user_collections:
-			cu = collection.collectionsuploads
-			for i in cu:
-				user_cu.append(i.upload_id)
-
-		singleuploads = []
-
-		for i in user_uploads:
-			if i.id not in user_cu:
-				singleuploads.append(i)
-
-		print '**** Unattached uploads: ', singleuploads
-
-		# print "user collectionsuploads: ", user_cu
-
-
-		return render_template("profile2.html", user=user, singleuploads=singleuploads)
-
-	else:
-		flash('You must be logged in to view files')
-		return redirect('/login')
-
-
 @app.route('/listen/<int:id>')
 def listen_audio(id):
 	"""Show more information about the single user logged in."""
 
-	if "email" in session: # if logged in
+	if 'email' in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 		print "User ID of this user: ", user.id
@@ -219,11 +205,11 @@ def listen_audio(id):
 		parent_collections = this_file.collectionsuploads
 		print "*******This upload belongs to: ", parent_collections
 
+		# TODO: check for user permissions before rendering template ::
 		# from collections uploads, get collection id
 		# from collection id, find collectionsusers
 		# from collectionsusers find all users
 		# check if logged in user id is in this list for access
-		
 		if this_file.user_id == user.id:
 			return render_template('listen.html', user=user, upload=this_file)
 
@@ -236,22 +222,19 @@ def listen_audio(id):
 def collection_page(id):
 	"""Show more information about a collection."""
 
-	if "email" in session: # if logged in
+	if 'email' in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
-		print "User ID of this user: ", user.id
 
 		this_collection = Collection.query.filter_by(id=id).first()
-		print "This collection: ", this_collection
 
+		# create list of uploads attached to current collection
 		uploads = [cu.upload for cu in this_collection.collectionsuploads]
-		print "This collection's uploads: ", uploads
 
-		print "CollectionsUsers before query: ", this_collection.collectionsusers
-
+		# get list of users with permission for viewing collection
 		collectionusers = CollectionsUsers.query.filter_by(collection_id=id).all()
-		print "This collection to user relationship: ", collectionusers
 
+		# TODO: check for user permissions before rendering template
 		return render_template('collection.html', user=user, collection=this_collection, uploads=uploads)
 
 	else:
@@ -264,7 +247,7 @@ def add_to_collection(id):
 	"""Add an existing upload to a collection."""
 	print 'ADD TO COLLECTION *************'
 	upload_id = id
-	if "email" in session: # if logged in
+	if 'email' in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
@@ -320,7 +303,7 @@ def add_upload_to_collection(id):
 
 
 
-	# if "email" in session: # if logged in
+	# if 'email' in session: # if logged in
 	# 	user_email = session['email']
 	# 	user = User.query.filter_by(email=user_email).first()
 
@@ -357,7 +340,7 @@ def share_collection(id):
 
 	collection_id = id
 
-	if "email" in session: # if logged in
+	if 'email' in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
@@ -412,8 +395,6 @@ def requested_audio_page(id):
 	return render_template("request_page.html", requested_obj=requested_obj)
 
 
-
-# User Login and Register 
 @app.route('/login')
 def login_user():
 	"""Login page for user."""
@@ -428,6 +409,7 @@ def login_process():
 	entered_email = request.form['email']
 	entered_pw = request.form['password']
 
+	# check db for user
 	user = User.query.filter_by(email=entered_email).first()
 	
 	if user != None:
@@ -442,7 +424,6 @@ def login_process():
 	else:
 		flash("No existing account for %s" % entered_email)
 		return redirect('/signup')
-
 
 
 @app.route('/signup')
@@ -462,11 +443,12 @@ def signup_process():
 	entered_pw = request.form['password']
 	entered_pw2 = request.form['password2']
 
+	# check db if existing user email
 	user = User.query.filter_by(email=entered_email).first()
 
 	if request.method == "POST":
+		# if no existing user, add to db
 		if user == None: 
-			print user 
 			if entered_pw != entered_pw2:  
 				flash("Your passwords did not match")
 				return redirect("/signup")
@@ -490,8 +472,8 @@ def process_logout():
     """Route to process logout for users."""
 
     session.pop('email')
+
     flash('You successfully logged out!')
-    print session
     return redirect("/")
 
 
