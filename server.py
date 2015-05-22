@@ -288,48 +288,44 @@ def add_to_collection(id):
 @app.route('/add-to-collection/<int:id>', methods=['GET', 'POST'])
 def add_upload_to_collection(id):
 	"""Add an existing upload to a collection."""
-	print 'ADD TO COLLECTION *************'
+
 	upload_id = request.form.get('upload_id')
 	upload = Upload.query.get(id)
-	print 'Upload id: ', upload_id
 
 	collection_id = request.form.get('collection_id')
 	collection = Collection.query.get(collection_id)
-	print 'Collection id: ', collection_id
 
-	# flash('Successfully added %s to the %s collection' % (upload.title, collection.title))
+	if 'email' in session: # if logged in
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
 
-	return redirect('/profile')
+		# check if upload is in current collection
+		current_cu = CollectionsUploads.query.filter_by(collection_id=collection.id, upload_id=upload.id).first()
 
+		# check if upload is associated with other collection
+		other_cu = CollectionsUploads.query.filter_by(upload_id=upload.id).first()
 
+		if other_cu == None:
+			print 'upload is not part of a collection'
+			add_to_collect = CollectionsUploads(collection_id=collection.id, upload_id=upload_id)
+			db.session.add(add_to_collect)
+			db.session.commit()
+			print 'added unattached upload to new collection'
 
-	# if 'email' in session: # if logged in
-	# 	user_email = session['email']
-	# 	user = User.query.filter_by(email=user_email).first()
+		elif current_cu:
+			print 'do nothing becasue it is part of collection'
+			flash('')
 
-	# 	this_collection = request.form['collection']
-	# 	existing_collection = Collection.query.filter_by(title=this_collection, user_id=user.id).first()
+		else:
+			other_cu.collection_id = collection.id
+			db.session.commit()
+			print 'switched collections'
 
-	# 	if existing_collection == None: # if no collection exists of the same name from this user, not possible
+		return redirect('/profile')
 
-	# 		flash('This is not possible')
-	# 		return redirect('/profile')
-
-	# 	else: # associate this upload to the already existing collection
-	# 		print 'Existing collection id: ', existing_collection.id
-	# 		print 'Upload id: ', upload_id
-	# 		add_this_upload = CollectionsUploads(collection_id=existing_collection.id, upload_id=upload_id)
-	# 		# db.session.add(add_this_upload)
-	# 		# db.session.commit()
-	# 		print 'Add this upload to existing collection: ', add_this_upload
-			
-	# 		flash('Successfully added to collection')
-
-	# 		return redirect('/profile')
-
-	# else:
-	# 	flash('You must be logged in to view files')
-	# 	return redirect('/login')
+	else:
+		flash('You must be logged in to view files')
+		return redirect('/login')
 
 
 

@@ -6,7 +6,12 @@
             draggable =  _.isArray(draggable) ?
                 draggable : [draggable];
             _.each(draggable, function(item){
-                item.draggable();
+                item.draggable({ 
+                    helper: "original",
+                    revert: "invalid",
+                    stack: ".draggable",
+
+                });
             })
             
             var droppable = $( ".droppable");
@@ -22,9 +27,6 @@
                         var collectionId = event.target.attributes['collection-id'].value;
                         console.log('Collection ID: ' + collectionId);
 
-                        // TODO: add uploadId -> collectionId
-                        // TODO: when done - refresh the page 
-                        var v = 123;
                         $.ajax({
                             url: "/add-to-collection/"+uploadId +"",
                             type: "POST",
@@ -33,7 +35,6 @@
                                 'collection_id': collectionId 
                             } 
                         }).done(function(data) {
-                            console.log(data);
                             window.location.href = "/success-collection";
                         });
                     }
@@ -47,15 +48,14 @@
 
     <hr>
 
-    <table class="table">
-        <tbody> 
+    <div class="file-box">
+        <ul class="list-group">
             {% if user.collections %}
                 {% for collection in user.collections %}
-                    <tr class="droppable active" collection-id="{{ collection.id }}">
-                        <td></td>
-                        <td><a href="/collection/{{ collection.id }}">{{ collection.title }}</a></td>
-                        <td></td>
-                        <td>
+                    <li class="droppable list-group-item collection row" collection-id="{{ collection.id }}">
+                        <div class="name col-sm-6"><a href="/collection/{{ collection.id }}">{{ collection.title }}</a></div>
+                        <div class="type col-sm-3">Collection</div>
+                        <div class="share col-sm-3">
                             <!-- Button trigger modal -->
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#share-{{ collection.id }}">
                               Share
@@ -80,57 +80,48 @@
                                     </div>
                                 </div>
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </li>
                     {% for cu in collection.collectionsuploads %}
-                        <tr class="draggable upload" upload-id="{{ cu.upload.id }}">
-                            <td><div class="drag-drop"/></td>
-                            <td><a href="/listen/{{ cu.upload.id }}">{{ cu.upload.title }}</a></td>
-                            <td>{{ cu.upload.transcript }}</td>
-                            <td>Share Social</td>
-                        </tr>
+                        <li class="draggable upload list-group-item row" upload-id="{{ cu.upload.id }}">
+                            <div class="name col-sm-6"><a href="/listen/{{ cu.upload.id }}">{{ cu.upload.title }}</a></div>
+                            <div class="type col-sm-3">Audio File</div>
+                            <div class="share col-sm-3">Share Social</div>
+                        </li>
                     {% endfor %}
                 {% endfor %}
             {% endif %}
-        </tbody>
-    </table>
+        </ul>
+    </div>
 
     {% if singleuploads %}
 
     <h5>Unattached Uploads</h5>
-    <table class="table">
-        <tbody> 
+    <div class="file-box">
+        <ul class="list-group"> 
             {% for upload in singleuploads %}
-                <tr class="draggable upload" upload-id="{{ upload.id }}">
-                    <td><div class="drag-drop"/></td>
-                    <td><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></td>
-                    <td>{{ upload.transcript }}</td>
-                    <td>Share Social</td>
-                </tr>                   
+                <li class="draggable upload list-group-item row" upload-id="{{ upload.id }}">
+                    <div class="name col-sm-6"><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></div>
+                    <div class="type col-sm-3">Audio File</div>
+                    <div class="share col-sm-3">Share Social</div>
+                </li>          
             {% endfor %}
-        </tbody>
-    </table>
+        </ul>
+    </div>
     {% endif %}
-
-    <hr>
 
     {% if user.collectionsusers %}
     <h5>Collections Shared With Me</h5>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Title</th>
-        </tr>
-        </thead>
-        <tbody> 
-        {% for collection in user.collectionsusers %}
-        <tr>
-            <td><a href="/collection/{{ collection.collection.id }}">{{ collection.collection.title }}</a></td>
-            
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="file-box">
+        <ul class="list-group">
+            {% for collection in user.collectionsusers %}
+                <li class="list-group-item collection row">
+                    <div class="name col-sm-6"><a href="/collection/{{ collection.collection.id }}">{{ collection.collection.title }}</a></div>
+                    <div class="col-sm-6">Shared by: {{ collection.collection.user.first_name }} {{ collection.collection.user.last_name }}</div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
     {% endif %}
 
 {% endblock %}

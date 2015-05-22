@@ -1,3 +1,22 @@
+.navbar-default {
+  background-color: #C13561;
+  background-image: -webkit-linear-gradient(-360deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);
+  background-image: linear-gradient(90deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);
+  color: #fff;
+}
+
+.navbar-default a, 
+.navbar-default .navbar-brand, 
+.navbar-default .navbar-nav>li>a {
+  color: #fff;
+}
+
+body {
+  background-color: #E6E3DD;
+  color: #705E40;
+}
+
+
 #recordingslist audio { 
   display: block; margin-bottom: 10px; 
 }
@@ -18,18 +37,27 @@
   min-height: 150px;
 }
 
-.upload {
-  padding-left: 40px;
+.jumbotron {
+  background-color: rgba(0,0,0,0.1);
 }
 
-.drag-drop {
-  background: url(/static/img/drag-drop.png);
-  vertical-align: middle;
-  height: 41px;
-  width: 16px;
-  margin: 0 5px;
+/*.list-group {
+  background-color: #fff;
+}*/
+
+.draggable {
+  background: url('/static/img/drag-drop.png') no-repeat 10px center rgba(255,255,255,0.7);
+  clear: both;
+  display: block;
+  min-height: 61px;
+  padding-left: 30px;
 }
 
-.drag-drop:hover {
+.draggable:hover {
   cursor: -webkit-grab;
+}
+
+.collection {
+  background-color: #efefef !important;
+  padding-left: 30px;
 }
