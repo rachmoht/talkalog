@@ -7,24 +7,34 @@
     
     <h2>{{ collection.title }}</h2>
     {% if uploads %}
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Title</th>
-                <th>Transcript</th>
-                <th>Owner</th>
-            </tr>
-            </thead>
-            <tbody> 
+    <div class="file-box">
+        <ul class="list-group">
+            <li class="list-group-item list-group-heading row">
+                <div class="name col-sm-6">
+                    <h6>Title</h6>
+                </div>
+                <div class="col-sm-3">
+                    <h6>Transcript</h6>
+                </div>
+                <div class="col-sm-3">
+                    <h6>Owner</h6>
+                </div>
+            </li>
             {% for upload in uploads %}
-                <tr>
-                    <td><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></td>
-                    <td>{{ upload.transcript }}</td>
-                    <td>{{ upload.user.first_name }}</td>
-                </tr>
+                <li class="list-group-item row">
+                    <div class="col-sm-6">
+                        <a href="/listen/{{ upload.id }}">{{ upload.title }}</a>
+                    </div>
+                    <div class="col-sm-3">
+                        {{ upload.transcript }}
+                    </div>
+                    <div class="col-sm-3">
+                        {{ upload.user.first_name }}
+                    </div>
+                </li>
             {% endfor %}
-            </tbody>
-        </table>
+        </ul>
+    </div>
     {% endif %}
 
 {% endblock %}

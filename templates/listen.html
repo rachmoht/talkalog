@@ -6,38 +6,43 @@
     <hr>
     
     <h2>{{ upload.title }}</h2>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Play</th>
-            <th>Transcript</th>
-            <th>Collection</th>
-        </tr>
-        </thead>
-        <tbody> 
-        <tr>
-            <td>
-                <audio controls>
-                    <source src="/uploads/{{ upload.path }}" type="audio/wav">
-                </audio>
-            </td>
-            <td>{{ upload.transcript }}</td>
-            <td>
-                {% if upload.collectionsuploads %}
-                    {% for uc in upload.collectionsuploads %}
-                        <a href="/collection/{{ uc.collection.id }}">{{ uc.collection.title }}</a>
-                    {% endfor %}
-                {% else %}
-                    <form action="/add/{{ upload.id }}" method="POST">
-                        <label>Collection: 
-                            <input type="text" name="collection">
-                        </label>
-                        <input type="submit" value="Save Collection">
-                    </form>
-                {% endif %}
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
+    <div class="file-box">
+        <ul class="list-group">
+            <li class="list-group-item list-group-heading row">
+                <div class="name col-sm-6">
+                    <h6>Play</h6>
+                </div>
+                <div class="type col-sm-3">
+                    <h6>Transcript</h6>
+                </div>
+                <div class="share col-sm-3">
+                    <h6>Collection</h6>
+                </div>
+            </li>
+            <li class="list-group-item row">
+                <div class="col-sm-6">
+                    <audio controls>
+                        <source src="/uploads/{{ upload.path }}" type="audio/wav">
+                    </audio>
+                </div>
+                <div class="col-sm-3">
+                    {{ upload.transcript }}
+                </div>
+                <div class="col-sm-3">
+                    {% if upload.collectionsuploads %}
+                        {% for uc in upload.collectionsuploads %}
+                            <a href="/collection/{{ uc.collection.id }}">{{ uc.collection.title }}</a>
+                        {% endfor %}
+                    {% else %}
+                        <form action="/add/{{ upload.id }}" method="POST">
+                            <label>Collection: 
+                                <input type="text" name="collection">
+                            </label>
+                            <input type="submit" value="Save Collection">
+                        </form>
+                    {% endif %}
+                </div>
+            </li>
+        </ul>
+    </div>
 {% endblock %}

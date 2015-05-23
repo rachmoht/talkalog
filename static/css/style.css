@@ -41,9 +41,10 @@ body {
   background-color: rgba(0,0,0,0.1);
 }
 
-/*.list-group {
-  background-color: #fff;
-}*/
+.list-group-heading {
+  background-color: #afa797;
+  color: #fff;
+}
 
 .draggable {
   background: url('/static/img/drag-drop.png') no-repeat 10px center rgba(255,255,255,0.7);

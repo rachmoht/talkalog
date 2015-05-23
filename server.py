@@ -132,7 +132,15 @@ def success_message_record():
 @app.route('/success-collection')
 def success_message_upload():
 	"""Flash a success message and redirect to user profile at submit."""
-	flash('Upload added to collection!')
+	upload_id = request.args.get('UPLOAD_ID')
+	upload = Upload.query.get(upload_id)
+
+	collection_id = request.args.get('COLLECTION_ID')
+	collection = Collection.query.get(collection_id)
+
+	print 'UPLOAD ID: ', upload_id
+
+	flash('Upload %s added to collection %s!' % (upload.title, collection.title))
 	return redirect('/profile')
 
 
