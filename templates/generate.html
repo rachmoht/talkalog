@@ -1,16 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <h2>Request a Recording</h2>
+    {% if request_number %}
+      <p>Request sent! This request number: {{ request_number }}</a></p>
+
+    {% else %}
+
+    <h2>Generate Request URL</h2>
     <form action="/generate" method="POST">
-    	<label>Title: 
-    		<input type="text" name="title">
-    	</label>
-    	<input type="submit" value="Generate a request URL!">
+        <div class="form-group">
+        	<label for="title">Title:</label>
+        	<input type="text" name="title" class="form-control" placeholder="Audio Title">
+        </div>
+    	<input type="submit" value="Generate a request URL!" class="btn btn-default">
     </form>
 
     {% if generated_url %}
       <p>Share this URL to request recording:<br> <a href="/request/{{ generated_url }}">/request/{{ generated_url }}</a></p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Generate Request Call</h2>
+    <form action="/generate-twilio" method="POST">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" name="title" class="form-control" placeholder="Audio Title">
+        </div>
+
+        <div class="form-group">
+            <label for="tel">Phone Number:</label>
+            <input type="text" name="tel" class="form-control" placeholder="555-555-5555">
+        </div>
+        <input type="submit" value="Send a request via Text!" class="btn btn-default">
+    </form>
+
     {% endif %}
 
 {% endblock %}

@@ -1,68 +1,73 @@
-<!doctype html>
-<html>
-<head>
-	<title>{% block title %}Audio Project{% endblock %}</title>
-  <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/css/style.css"/>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+  	<title>{% block title %}Audio Project{% endblock %}</title>
+    
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css"/>
 
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-  {% block imports %}{% endblock %}
-</head>
-<body>
-  <nav class="navbar navbar-default">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/">Audio</a>
-      </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    {% block imports %}{% endblock %}
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Audio</a>
+        </div>
 
 
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav navbar-right">
-          {% if 'email' in session %}
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ session['email'] }} <span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="/"><span class="glyphicon glyphicon-headphones" aria-hidden="true"></span> Profile</a></li>
-                <li><a href="/record"><span class="glyphicon glyphicon-record" aria-hidden="true"></span> Record</a></li>
-                <li><a href="/generate"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send Request</a></li>
-                <li class="divider"></li>
-                <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a></li>
-              </ul>
-            </li>
-          {% else %}
-            <li><a href="/login">Login</a></li>
-            <li><a href="/signup">Sign Up</a></li>
-          {% endif %}
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-  </nav>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            {% if 'email' in session %}
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ session['email'] }} <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="/"><span class="glyphicon glyphicon-headphones" aria-hidden="true"></span> Profile</a></li>
+                  <li><a href="/record"><span class="glyphicon glyphicon-record" aria-hidden="true"></span> Record</a></li>
+                  <li><a href="/generate"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send Request</a></li>
+                  <li class="divider"></li>
+                  <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a></li>
+                </ul>
+              </li>
+            {% else %}
+              <li><a href="/login">Login</a></li>
+              <li><a href="/signup">Sign Up</a></li>
+            {% endif %}
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
 
-  <div class="container">
-    <!-- Show flashed messages -->
-    {% with messages = get_flashed_messages() %}
-      {% for message in messages %}
-          <div class="alert alert-warning">{{ message }}</div>
-      {% endfor %}
-    {% endwith %}
+    <div class="container">
+      <!-- Show flashed messages -->
+      {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <div class="alert alert-warning">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
 
-  	{% block content %}
-  		<!-- Content here -->
-  	{% endblock %}
-  </div>
-</body>
+    	{% block content %}
+    		<!-- Content here -->
+    	{% endblock %}
+    </div>
+  </body>
 </html>

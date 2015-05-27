@@ -55,7 +55,6 @@ function createDownloadLink() {
       var myTranscript = $( '#final_span' ).html();
       
       form.append('title', $('#recording-title').val());
-      form.append('desc', $('#recording-desc').val());
       form.append('transcript', myTranscript);
       alert(myTranscript);
       alert('Submitting!');

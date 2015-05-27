@@ -1,7 +1,7 @@
 .navbar-default {
   background-color: #C13561;
-  background-image: -webkit-linear-gradient(-360deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);
-  background-image: linear-gradient(90deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);
+  /*background-image: -webkit-linear-gradient(-360deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);
+  background-image: linear-gradient(90deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);*/
   color: #fff;
 }
 
