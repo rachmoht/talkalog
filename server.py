@@ -16,7 +16,25 @@ from twilio.rest import TwilioRestClient
 
 from model import User, Upload, Collection, RequestURL, CollectionsUsers, CollectionsUploads, connect_to_db, db
 
+import boto
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+from StringIO import StringIO
+
+# Your Account Sid and Auth Token from twilio.com/user/account
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token  = os.environ['TWILIO_AUTH_TOKEN']
+client = TwilioRestClient(account_sid, auth_token)
+
+# connect to s3 - uses .boto file for aws credentials
+conn = S3Connection()
+
+# s3 connection and bucket definition
+c = boto.connect_s3()
+b = c.get_bucket('radhackbright')
+
 # Required for saving our wav files to our server @ uploads/
+# TODO: modify upload folder to point to s3, but still mask as upload/
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = set(['wav'])
 
@@ -113,6 +131,11 @@ def record_audio():
 				db.session.commit()
 				print 'Committed new recording %s' % filename
 
+				k = b.new_key(filename)
+
+				k.set_contents_from_file(file)
+				print 'Key: ', k.key, '; K: ', k
+
 				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 				flash('Memo successfully recorded!')
@@ -155,8 +178,16 @@ def thanks_message_request():
 
 
 # TODO: where is the best place for function in this file?
-def id_generator(size=20, chars=string.ascii_uppercase + string.digits):
-	return ''.join(random.choice(chars) for _ in range(size))
+def id_generator(size=5, chars=string.ascii_uppercase + string.digits):
+	request_id = ''.join(random.choice(chars) for _ in range(size))
+	print request_id
+	# TODO: check to make sure this id string does not already exist in request URL table
+	existing_request = RequestURL.query.filter_by(id=request_id).first()
+
+	while existing_request == None:
+		return request_id
+
+	request_id = ''.join(random.choice(chars) for _ in range(size))
 
 
 @app.route('/generate', methods=['GET', 'POST'])
@@ -204,13 +235,8 @@ def generate_twilio():
 	"""Generate audio call request and send via Twilio text."""
 
 	# initialize generated_url
+	generated_url = False
 	request_number = False
-
-
-	# Your Account Sid and Auth Token from twilio.com/user/account
-	account_sid = os.environ['TWILIO_ACCOUNT_SID']
-	auth_token  = os.environ['TWILIO_AUTH_TOKEN']
-	client = TwilioRestClient(account_sid, auth_token)
 
 	if 'email' in session: 
 		user_email = session['email']
@@ -253,7 +279,7 @@ def generate_twilio():
 		flash('You must be logged in to generate request URL!')
 		return redirect('/login')
 
-	return render_template("generate_twilio.html", request_number=request_number)
+	return render_template("generate.html", request_number=request_number)
 
 
 
@@ -309,6 +335,16 @@ def handle_recording():
 	"""Play back the caller's recording."""
 
 	recording_url = request.values.get("RecordingUrl", None)
+	print recording_url
+
+	call_sid = request.values.get("CallSid", None)
+	print '**** CALL SID: ', call_sid
+
+	recording_sid = request.values.get("RecordingSid", None)
+	print '**** RECORDING SID: ', recording_sid
+
+	date_created = request.values.get("DateCreated", None)
+	print '**** Date Created: ', date_created
 
 	resp = twilio.twiml.Response()
 	resp.say("Thanks for your story... take a listen.")
@@ -318,6 +354,21 @@ def handle_recording():
 	print 'This is the recording: ', recording_url
 	# TODO: Save this recording to server with associated upload ID made @ time of request
 	# TODO: Delete this recording using client.recordings.delete(RecordingSid)
+
+
+
+
+	k = b.new_key(recording_sid + '.wav')
+
+	upload_file = StringIO(file)
+	print 'Upload file: ', upload_file
+
+	k.set_contents_from_file(upload_file)
+	print 'Key: ', k.key, '; K: ', k
+
+	client.recordings.delete(recording_sid)
+	print 'Deleted recording from Twilio'
+
 	return str(resp)
 
 
@@ -447,7 +498,7 @@ def add_upload_to_collection(id):
 			print 'added unattached upload to new collection'
 
 		elif current_cu:
-			print 'do nothing becasue it is part of collection'
+			print 'do nothing because it is part of collection'
 			flash('')
 
 		else:
