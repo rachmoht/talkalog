@@ -4,10 +4,9 @@
 <script src="/static/js/recorderFunctions.js"></script>
 {% endblock %}
 {% block content %}
-
 <h1>Record</h1>
-<button onclick="startRecording(this); startButton(event);" id="start_button">record</button>
-<button onclick="stopRecording(this); startButton(event);" disabled>stop</button>
+<button id="start_button">record</button>
+<button id="stop_button">stop</button>
 
 <div id="info">
 </div>
@@ -39,4 +38,17 @@
 
 <script src="/static/js/webSpeech.js"></script>
 
+<script>
+
+$('#start_button').click(function() {
+  startRecording(this);
+  startButton(event);
+});
+
+$('#stop_button').click(function() {
+  stopRecording(this); 
+  startButton(event);
+});
+
+</script>
 {% endblock %}

@@ -35,7 +35,7 @@ b = c.get_bucket('radhackbright')
 
 # Required for saving our wav files to our server @ uploads/
 # TODO: modify upload folder to point to s3, but still mask as upload/
-UPLOAD_FOLDER = 'uploads/'
+UPLOAD_FOLDER = 'https://s3.amazonaws.com/radhackbright'
 ALLOWED_EXTENSIONS = set(['wav'])
 
 app = Flask(__name__)
@@ -122,8 +122,8 @@ def record_audio():
 			transcript = request.form.get('transcript')
 			print file
 
-			if file and is_allowed_file(file.filename):
-				filename = secure_filename(file.filename)
+			if file:
+				filename = id_generator(30) + '.wav'
 				new_recording = Upload(user_id=user.id, title=title, path=filename, transcript=transcript)
 				print 'Created new recording ', new_recording
 				db.session.add(new_recording)
@@ -136,7 +136,7 @@ def record_audio():
 				k.set_contents_from_file(file)
 				print 'Key: ', k.key, '; K: ', k
 
-				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+				# file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 				flash('Memo successfully recorded!')
 				return redirect('/profile')
@@ -396,7 +396,7 @@ def listen_audio(id):
 		# from collectionsusers find all users
 		# check if logged in user id is in this list for access
 		if this_file.user_id == user.id:
-			return render_template('listen.html', user=user, upload=this_file)
+			return render_template('listen.html', user=user, upload=this_file, upload_folder=UPLOAD_FOLDER)
 
 		else:
 			flash('You don\'t have access to view this page')
