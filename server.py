@@ -11,6 +11,8 @@ import os
 import string
 import random
 
+import requests
+
 import twilio.twiml
 from twilio.rest import TwilioRestClient
 
@@ -184,12 +186,12 @@ def str_generator(size=5, chars=string.ascii_uppercase + string.digits):
 	rand_str = ''.join(random.choice(chars) for _ in range(size))
 	print rand_str
 	# TODO: check to make sure this filename string does not already exist
-	existing_filename = Uploads.query.filter_by(path=rand_str).first()
+	existing_filename = Upload.query.filter_by(path=rand_str).first()
 
-	while existing_request == None:
-		return request_id
+	while existing_filename == None:
+		return rand_str
 
-	request_id = ''.join(random.choice(chars) for _ in range(size))
+	rand_str = ''.join(random.choice(chars) for _ in range(size))
 
 
 @app.route('/generate', methods=['GET', 'POST'])
@@ -276,7 +278,7 @@ def incoming_call():
 
 	resp = twilio.twiml.Response()
 	# Greet the caller
-	resp.say("Hello. Your story is special and should be preserved.")
+	resp.say("Hello.")
 
 	# Gather digits.
 	with resp.gather(numDigits=5, action="/handle-key", method="POST") as g:
@@ -292,24 +294,36 @@ def handle_key():
 
 	requestid = RequestID.query.filter_by(id=digits_pressed).first()
 	print 'Request: ', requestid
-	requested_story = Upload.query.filter_by(id=requestid.upload_id).first()
-	user = User.query.filter_by(id=requestid.user_id).first()
-
-	call_sid = request.values.get("CallSid", None)
-	print '***CALL SID in handle-key: ', call_sid
-
-	# add call_sid to Requests db
-	requestid.call_sid = call_sid
-	print requestid.call_sid
-	db.session.commit()
-	print 'Committed Call SID to db: ', requestid
+	
+	resp = twilio.twiml.Response()
 
 	if requestid == None:
-		resp = twilio.twiml.Response()
 		resp.say("Sorry. That request ID was not found. Please try again.")
 		return redirect("/incoming")
 
 	else:
+		requested_story = Upload.query.filter_by(id=requestid.upload_id).first()
+		print 'Requested Story: ', requested_story
+		print 'Requested Story PATH: ', requested_story.path
+
+		user = User.query.filter_by(id=requested_story.user_id).first()
+		print 'User who made request: ', user
+
+		# if requested_story.path:
+		# 	print 'UPLOAD PATH EXISTS'
+		# 	resp.say("This request has expired. Goodbye.")
+		# 	return str(resp)
+
+		# else:
+
+		call_sid = request.values.get("CallSid", None)
+		print '***CALL SID in handle-key: ', call_sid
+
+		# add call_sid to Requests db
+		requestid.call_sid = call_sid
+		db.session.commit()
+		print 'Committed Call SID to db: ', requestid
+	
 		resp = twilio.twiml.Response()
 		resp.say("Thank you! %s is requesting a recording for %s. Start recording your story after the tone. After you are finished recording, press any key to confirm." % (user.first_name, requested_story.title))
 		resp.record(action="/handle-recording")
@@ -322,6 +336,9 @@ def handle_recording():
 
 	recording_url = request.values.get("RecordingUrl", None)
 	print 'Recording URL: ', recording_url
+
+	recording_uri = requests.get(recording_url)
+	print 'Recording URI: ', recording_uri
 
 	call_sid = request.values.get("CallSid", None)
 	print '***Call Sid in handle-recording: ', call_sid
@@ -340,19 +357,22 @@ def handle_recording():
 	resp.say("Goodbye.")
 	print 'This is the recording: ', recording_url
 
+	# save recording to S3
+	k = b.new_key(recording_sid + '.wav')
+	# upload_file = StringIO(recording_url)
+	# print 'Upload file: ', upload_file
+	k.set_metadata('Content-Type', 'audio/wav')
+	k.set_contents_from_string(recording_uri.content)
+	k.set_acl('public-read') 
+	print 'Key: ', k.key, '; K: ', k
+
 	filename = recording_sid + '.wav'
 	requested_story.path = filename
 	db.session.commit()
 	print 'New recording %s to db' % filename
 
-	# save audio file to S3 bucket
-	k = b.new_key(filename)
-	upload_file = StringIO(file)
-	k.set_contents_from_file(upload_file)
-	print 'Key: ', k.key, '; K: ', k
-
 	# delete recording from Twilio servers
-	client.recordings.delete(recording_sid)
+	# client.recordings.delete(recording_sid)
 
 	return str(resp)
 

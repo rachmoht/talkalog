@@ -101,11 +101,13 @@
     <div class="file-box">
         <ul class="list-group"> 
             {% for upload in singleuploads %}
-                <li class="draggable upload list-group-item row" upload-id="{{ upload.id }}">
-                    <div class="name col-sm-6"><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></div>
-                    <div class="type col-sm-3">Audio File</div>
-                    <div class="share col-sm-3">Share Social</div>
-                </li>          
+                {% if upload.path %}
+                    <li class="draggable upload list-group-item row" upload-id="{{ upload.id }}">
+                        <div class="name col-sm-6"><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></div>
+                        <div class="type col-sm-3">Audio File</div>
+                        <div class="share col-sm-3">Share Social</div>
+                    </li> 
+                {% endif %}         
             {% endfor %}
         </ul>
     </div>
