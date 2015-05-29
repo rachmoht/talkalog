@@ -55,8 +55,6 @@ function createDownloadLink() {
     
       form.append('title', $('#recording-title').val());
       form.append('transcript', myTranscript);
-      alert(myTranscript);
-      alert('Submitting!');
       $.ajax({
         type: 'POST',
         url: '/record',

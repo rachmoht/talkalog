@@ -92,7 +92,6 @@ recognition.continuous = true;
 recognition.interimResults = true;
 recognition.onstart = function() {
   recognizing = true;
-  alert('Starting web speech API');
   showInfo('info_speak_now');
   // start_img.src = 'mic-animate.gif';
 };
@@ -203,6 +202,12 @@ if (recognizing) {
   recognition.stop();
   return;
 }
+
+// Recorder.js recorder function start here
+// to cut down on number of clicks for permissions
+  recorder && recorder.record();
+  __log('Recording...');
+
 final_transcript = '';
 recognition.lang = select_dialect.value;
 recognition.start();

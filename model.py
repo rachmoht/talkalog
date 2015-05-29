@@ -52,25 +52,26 @@ class Upload(db.Model):
         self.id, self.user_id, self.title, self.path, self.mimetype, self.datetime, self.transcript)
 
 
-class RequestURL(db.Model):
-    """Request URLs: id will be a unique hashed string associated
+class RequestID(db.Model):
+    """Request: id will be a unique hashed string associated
     with one user account. When a file is recorded at that page,
     path is then stored in Uploads and associated with user id."""
 
-    __tablename__ = "RequestURLs"
+    __tablename__ = "Requests"
 
     id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
     upload_id = db.Column(db.Integer, db.ForeignKey('Uploads.id'), nullable=False)
+    call_sid = db.Column(db.String)
 
-    user = db.relationship("User", backref=db.backref("requesturls", order_by=id))
-    upload = db.relationship("Upload", backref=db.backref("requesturls", order_by=id))
+    user = db.relationship("User", backref=db.backref("requestids", order_by=id))
+    upload = db.relationship("Upload", backref=db.backref("requestids", order_by=id))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Request URL id: %s user_id: %s upload_id: %s>" % (
-        self.id, self.user_id, self.upload_id)
+        return "<Request id: %s user_id: %s upload_id: %s call_sid: %s>" % (
+        self.id, self.user_id, self.upload_id, self.call_sid)
 
 
 class Collection(db.Model):

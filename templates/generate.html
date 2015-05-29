@@ -22,7 +22,7 @@
     <hr>
 
     <h2>Generate Request Call</h2>
-    <form action="/generate-twilio" method="POST">
+    <form action="/generate" method="POST">
         <div class="form-group">
             <label for="title">Title:</label>
             <input type="text" name="title" class="form-control" placeholder="Audio Title" required>
@@ -32,7 +32,7 @@
             <label for="tel">Phone Number:</label>
             <input type="tel" name="tel" class="form-control" placeholder="5555555555" min="10" max="10" required>
         </div>
-        <input type="submit" value="Send a request via Text!" class="btn btn-default">
+        <input type="submit" name="twilio" value="Send a request via Text!" class="btn btn-default">
     </form>
 
     {% endif %}

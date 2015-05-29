@@ -14,7 +14,7 @@ import random
 import twilio.twiml
 from twilio.rest import TwilioRestClient
 
-from model import User, Upload, Collection, RequestURL, CollectionsUsers, CollectionsUploads, connect_to_db, db
+from model import User, Upload, Collection, RequestID, CollectionsUsers, CollectionsUploads, connect_to_db, db
 
 import boto
 from boto.s3.connection import S3Connection
@@ -96,7 +96,7 @@ def user_page():
 			if i.id not in user_cu:
 				singleuploads.append(i)
 
-		return render_template("profile2.html", user=user, singleuploads=singleuploads)
+		return render_template("profile.html", user=user, singleuploads=singleuploads)
 
 	else:
 		flash('You must be logged in to view files')
@@ -110,33 +110,25 @@ def record_audio():
 	if 'email' in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
-		print 'User: ', user
 
 		if request.method == 'POST':
-			flash('Saved file!')
-			print 'is there a file attached? ', request.files # gets the ImmutableMultiDict for files
-			print 'request form: ', request.form # gets the ImmutableMultiDict for info
-			print 'more things, like the title: ', request.form.get('title')
 			file = request.files['file']
 			title = request.form.get('title')
 			transcript = request.form.get('transcript')
-			print file
+			print 'Audio file created: ', file
 
 			if file:
-				filename = id_generator(30) + '.wav'
+				filename = str_generator(30) + '.wav'
 				new_recording = Upload(user_id=user.id, title=title, path=filename, transcript=transcript)
 				print 'Created new recording ', new_recording
 				db.session.add(new_recording)
-				print 'Adding new recording'
 				db.session.commit()
-				print 'Committed new recording %s' % filename
+				print 'New recording %s to db' % filename
 
+				# save audio file to S3 bucket
 				k = b.new_key(filename)
-
 				k.set_contents_from_file(file)
 				print 'Key: ', k.key, '; K: ', k
-
-				# file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 				flash('Memo successfully recorded!')
 				return redirect('/profile')
@@ -177,12 +169,22 @@ def thanks_message_request():
 	return render_template('thanks.html')
 
 
-# TODO: where is the best place for function in this file?
-def id_generator(size=5, chars=string.ascii_uppercase + string.digits):
+def request_generator(size=5, chars=string.digits):
 	request_id = ''.join(random.choice(chars) for _ in range(size))
 	print request_id
-	# TODO: check to make sure this id string does not already exist in request URL table
-	existing_request = RequestURL.query.filter_by(id=request_id).first()
+	existing_request = RequestID.query.filter_by(id=request_id).first()
+
+	while existing_request == None:
+		return request_id
+
+	request_id = ''.join(random.choice(chars) for _ in range(size))
+
+
+def str_generator(size=5, chars=string.ascii_uppercase + string.digits):
+	rand_str = ''.join(random.choice(chars) for _ in range(size))
+	print rand_str
+	# TODO: check to make sure this filename string does not already exist
+	existing_filename = Uploads.query.filter_by(path=rand_str).first()
 
 	while existing_request == None:
 		return request_id
@@ -204,83 +206,64 @@ def generate_request_str():
 
 		# when user submits form, generate string
 		if request.method == 'POST':
-			request_str = id_generator()
-			print 'Generated request string', request_str
-		
-			title = request.form.get('title')
-			print 'This is the title: ', title
+			if 'twilio' in request.form:
+				request_str = request_generator()
+				print 'Generated request string', request_str
+			
+				title = request.form.get('title')
+				print 'This is the title: ', title
 
-			new_upload_placeholder = Upload(user_id=user.id, title=title)
+				tel_number = request.form.get('tel')
+				print 'Tel number: ', tel_number
 
-			db.session.add(new_upload_placeholder)
-			db.session.commit()
+				new_upload_placeholder = Upload(user_id=user.id, title=title)
 
-			new_upload_id = new_upload_placeholder.id
-			new_request_url = RequestURL(id=request_str, user_id=user.id, upload_id=new_upload_id)
+				print 'Created new upload placeholder'
+				db.session.add(new_upload_placeholder)
+				db.session.commit()
 
-			db.session.add(new_request_url)
-			db.session.commit()
+				new_upload_id = new_upload_placeholder.id
+				new_request = RequestID(id=request_str, user_id=user.id, upload_id=new_upload_id)
 
-			generated_url = request_str
+				db.session.add(new_request)
+				db.session.commit()
+
+				twilio_number = '+14153196892'
+
+				message = client.messages.create(body="%s is requesting an audio recording. When you are ready, please call %s with Twilio and have your request ID ready: %s!" % (user.first_name, twilio_number, request_str),
+				# print message
+				to='+1' + tel_number,    # number to send request
+				from_="+14153196892") # Twilio number
+				# print message.sid
+
+				request_number = request_str
+
+			else: 
+				request_str = request_generator()
+				print 'Generated request string', request_str
+			
+				title = request.form.get('title')
+
+				new_upload_placeholder = Upload(user_id=user.id, title=title)
+
+				db.session.add(new_upload_placeholder)
+				db.session.commit()
+				print 'Added upload placeholder to db'
+
+				new_upload_id = new_upload_placeholder.id
+				new_request_url = RequestID(id=request_str, user_id=user.id, upload_id=new_upload_id)
+
+				db.session.add(new_request_url)
+				db.session.commit()
+				print 'Added request '
+
+				generated_url = request_str
 
 	else:
 		flash('You must be logged in to generate request URL!')
 		return redirect('/login')
 
 	return render_template("generate.html", generated_url=generated_url, request_number=request_number)
-
-
-@app.route('/generate-twilio', methods=['GET', 'POST'])
-def generate_twilio():
-	"""Generate audio call request and send via Twilio text."""
-
-	# initialize generated_url
-	generated_url = False
-	request_number = False
-
-	if 'email' in session: 
-		user_email = session['email']
-		user = User.query.filter_by(email=user_email).first()
-
-		# when user submits form, generate string
-		if request.method == 'POST':
-			request_str = id_generator()
-			print 'Generated request string', request_str
-		
-			title = request.form.get('title')
-			print 'This is the title: ', title
-
-			tel_number = request.form.get('tel')
-			print 'Tel number: ', tel_number
-
-			new_upload_placeholder = Upload(user_id=user.id, title=title)
-
-			print 'Created new upload placeholder'
-			# db.session.add(new_upload_placeholder)
-			# db.session.commit()
-
-			# new_upload_id = new_upload_placeholder.id
-			# new_request_url = RequestURL(id=request_str, user_id=user.id, upload_id=new_upload_id)
-
-			# db.session.add(new_request_url)
-			# db.session.commit()
-
-			twilio_number = '+14153196892'
-
-			message = client.messages.create(body="%s is requesting an audio recording. When you are ready, please call %s with Twilio!" % (user.first_name, twilio_number),
-			# print message
-			to='+1' + tel_number,    # number to send request
-			from_="+14153196892") # Twilio number
-			# print message.sid
-
-			request_number = request_str
-
-	else:
-		flash('You must be logged in to generate request URL!')
-		return redirect('/login')
-
-	return render_template("generate.html", request_number=request_number)
-
 
 
 @app.route("/incoming", methods=['GET', 'POST'])
@@ -291,43 +274,46 @@ def incoming_call():
 	request_url = request.values.get('')
 	print 'from number: ', from_number
 
-	caller = "Monkey"
-
 	resp = twilio.twiml.Response()
-	# Greet the caller by name
-	resp.say("Hello " + caller)
+	# Greet the caller
+	resp.say("Hello. Your story is special and should be preserved.")
 
 	# Gather digits.
-	with resp.gather(numDigits=1, action="/handle-key", method="POST") as g:
-		g.say("""For more information, press 1. 
-			Press 2 to begin your recording for TITLE.
-			Press any other key to start over.""")
-		# TODO: GET request upload title for prompt above
-
+	with resp.gather(numDigits=5, action="/handle-key", method="POST") as g:
+		g.say("""To continue, please enter the five digit code included in the text message request you received.""")
+	print str(resp)
 	return str(resp)
 
 
 @app.route("/handle-key", methods=['GET', 'POST'])
 def handle_key():
 	"""Handle key press from a user."""
-	digit_pressed = request.values.get('Digits', None)
+	digits_pressed = request.values.get('Digits', None)
 
-	if digit_pressed == "1":
+	requestid = RequestID.query.filter_by(id=digits_pressed).first()
+	print 'Request: ', requestid
+	requested_story = Upload.query.filter_by(id=requestid.upload_id).first()
+	user = User.query.filter_by(id=requestid.user_id).first()
+
+	call_sid = request.values.get("CallSid", None)
+	print '***CALL SID in handle-key: ', call_sid
+
+	# add call_sid to Requests db
+	requestid.call_sid = call_sid
+	print requestid.call_sid
+	db.session.commit()
+	print 'Committed Call SID to db: ', requestid
+
+	if requestid == None:
 		resp = twilio.twiml.Response()
-		resp.say("""If you have any questions, contact USER NAME for 
-			more information on AUDIO PROJECT.""")
-		# TODO: GET user name from db for prompt
+		resp.say("Sorry. That request ID was not found. Please try again.")
 		return redirect("/incoming")
 
-	elif digit_pressed == "2":
+	else:
 		resp = twilio.twiml.Response()
-		resp.say("Start recording your story after the tone.")
+		resp.say("Thank you! %s is requesting a recording for %s. Start recording your story after the tone. After you are finished recording, press any key to confirm." % (user.first_name, requested_story.title))
 		resp.record(action="/handle-recording")
 		return str(resp)
-
-	# If the caller pressed anything but 1, redirect them to the greeting menu.
-	else:
-		return redirect("/incoming")
 
 
 @app.route("/handle-recording", methods=['GET', 'POST'])
@@ -335,16 +321,17 @@ def handle_recording():
 	"""Play back the caller's recording."""
 
 	recording_url = request.values.get("RecordingUrl", None)
-	print recording_url
+	print 'Recording URL: ', recording_url
 
 	call_sid = request.values.get("CallSid", None)
-	print '**** CALL SID: ', call_sid
+	print '***Call Sid in handle-recording: ', call_sid
+
+	requestid = RequestID.query.filter_by(call_sid=call_sid).first()
+	requested_story = Upload.query.filter_by(id=requestid.upload_id).first()
+	user = User.query.filter_by(id=requestid.user_id).first()
 
 	recording_sid = request.values.get("RecordingSid", None)
-	print '**** RECORDING SID: ', recording_sid
-
-	date_created = request.values.get("DateCreated", None)
-	print '**** Date Created: ', date_created
+	print 'RECORDING SID: ', recording_sid
 
 	resp = twilio.twiml.Response()
 	resp.say("Thanks for your story... take a listen.")
@@ -352,22 +339,20 @@ def handle_recording():
 
 	resp.say("Goodbye.")
 	print 'This is the recording: ', recording_url
-	# TODO: Save this recording to server with associated upload ID made @ time of request
-	# TODO: Delete this recording using client.recordings.delete(RecordingSid)
 
+	filename = recording_sid + '.wav'
+	requested_story.path = filename
+	db.session.commit()
+	print 'New recording %s to db' % filename
 
-
-
-	k = b.new_key(recording_sid + '.wav')
-
+	# save audio file to S3 bucket
+	k = b.new_key(filename)
 	upload_file = StringIO(file)
-	print 'Upload file: ', upload_file
-
 	k.set_contents_from_file(upload_file)
 	print 'Key: ', k.key, '; K: ', k
 
+	# delete recording from Twilio servers
 	client.recordings.delete(recording_sid)
-	print 'Deleted recording from Twilio'
 
 	return str(resp)
 
@@ -546,7 +531,7 @@ def share_collection(id):
 @app.route('/request/<string:id>', methods=['GET', 'POST'])
 def requested_audio_page(id):
 	"""Show more information about the single user logged in."""
-	requested_obj = RequestURL.query.get(id)
+	requested_obj = Request.query.get(id)
 	assoc_upload = Upload.query.get(requested_obj.upload_id)
 	print assoc_upload
 

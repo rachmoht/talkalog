@@ -1,24 +1,31 @@
 {% extends 'base.html' %}
 {% block content %}
-
-    <h2>Sign Up</h2>
-    <form action="/signup-process" method="POST">
-      <label>First Name: 
-        <input type="text" name="first_name" placeholder="First name">
-      </label>
-      <label>Last Name: 
-        <input type="text" name="last_name" placeholder="Last name">
-      </label>
-      <label>Email: 
-        <input type="text" name="email" placeholder="name@domain.com">
-      </label>
-      <label>Password:
-        <input type="text" name="password">
-      </label>
-      <label>Confirm Password:
-        <input type="text" name="password2">
-      </label>
-      <input type="submit" value="Sign Up">
-    </form>
-
+  <h1>Audio Project | Sign Up</h1>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <form action="/signup-process" method="POST">
+        <div class="form-group">
+          <label for="first_name">First Name:</label>
+          <input type="text" name="first_name" placeholder="First name" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name:</label>
+          <input type="text" name="last_name" placeholder="Last name" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="text" name="email" placeholder="name@domain.com" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="text" name="password" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="password2">Confirm Password:</label>
+          <input type="text" name="password2" class="form-control">
+        </div>
+        <input type="submit" value="Sign Up" class="btn btn-default">
+      </form>
+    </div>
+  </div>
 {% endblock %}
