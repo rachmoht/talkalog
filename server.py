@@ -51,6 +51,29 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
+def request_generator(size=5, chars=string.digits):
+	request_id = ''.join(random.choice(chars) for _ in range(size))
+	print request_id
+	existing_request = RequestID.query.filter_by(id=request_id).first()
+
+	while existing_request == None:
+		return request_id
+
+	request_id = ''.join(random.choice(chars) for _ in range(size))
+
+
+def str_generator(size=5, chars=string.ascii_uppercase + string.digits):
+	rand_str = ''.join(random.choice(chars) for _ in range(size))
+	print rand_str
+	# TODO: check to make sure this filename string does not already exist
+	existing_filename = Upload.query.filter_by(path=rand_str).first()
+
+	while existing_filename == None:
+		return rand_str
+
+	rand_str = ''.join(random.choice(chars) for _ in range(size))
+
+
 def is_allowed_file(filename):
 	"""Check that file created by audio has allowed extension."""
 	return '.' in filename and \
@@ -109,7 +132,7 @@ def user_page():
 def record_audio():
 	"""Record audio. Capture data and be able to callback."""
 
-	if 'email' in session: # if logged in
+	if 'email' in session: 
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
@@ -117,81 +140,22 @@ def record_audio():
 			file = request.files['file']
 			title = request.form.get('title')
 			transcript = request.form.get('transcript')
-			print 'Audio file created: ', file
 
 			if file:
 				filename = str_generator(30) + '.wav'
 				new_recording = Upload(user_id=user.id, title=title, path=filename, transcript=transcript)
-				print 'Created new recording ', new_recording
 				db.session.add(new_recording)
 				db.session.commit()
-				print 'New recording %s to db' % filename
 
 				# save audio file to S3 bucket
 				k = b.new_key(filename)
 				k.set_contents_from_file(file)
-				print 'Key: ', k.key, '; K: ', k
-
-				flash('Memo successfully recorded!')
-				return redirect('/profile')
 
 		return render_template('record.html')
 
 	else:
 		flash('You must be logged in to save recording')
 		return redirect('/login')
-
-
-@app.route('/success')
-def success_message_record():
-	"""Flash a success message and redirect to user profile at submit."""
-	flash('Recording successfully submitted!')
-	return redirect('/profile')
-
-
-@app.route('/success-collection')
-def success_message_upload():
-	"""Flash a success message and redirect to user profile at submit."""
-	upload_id = request.args.get('UPLOAD_ID')
-	upload = Upload.query.get(upload_id)
-
-	collection_id = request.args.get('COLLECTION_ID')
-	collection = Collection.query.get(collection_id)
-
-	print 'UPLOAD ID: ', upload_id
-
-	flash('Upload %s added to collection %s!' % (upload.title, collection.title))
-	return redirect('/profile')
-
-
-@app.route('/thanks')
-def thanks_message_request():
-	"""Flash a success message and redirect to thank you page with info."""
-	flash('Recording successfully submitted!')
-	return render_template('thanks.html')
-
-
-def request_generator(size=5, chars=string.digits):
-	request_id = ''.join(random.choice(chars) for _ in range(size))
-	print request_id
-	existing_request = RequestID.query.filter_by(id=request_id).first()
-
-	while existing_request == None:
-		return request_id
-
-	request_id = ''.join(random.choice(chars) for _ in range(size))
-
-
-def str_generator(size=5, chars=string.ascii_uppercase + string.digits):
-	rand_str = ''.join(random.choice(chars) for _ in range(size))
-	print rand_str
-	# TODO: check to make sure this filename string does not already exist
-	existing_filename = Upload.query.filter_by(path=rand_str).first()
-
-	while existing_filename == None:
-		return rand_str
-
-	rand_str = ''.join(random.choice(chars) for _ in range(size))
 
 
 @app.route('/generate', methods=['GET', 'POST'])
@@ -206,37 +170,28 @@ def generate_request_str():
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
-		# when user submits form, generate string
 		if request.method == 'POST':
 			if 'twilio' in request.form:
 				request_str = request_generator()
-				print 'Generated request string', request_str
 			
 				title = request.form.get('title')
-				print 'This is the title: ', title
-
 				tel_number = request.form.get('tel')
-				print 'Tel number: ', tel_number
 
 				new_upload_placeholder = Upload(user_id=user.id, title=title)
-
-				print 'Created new upload placeholder'
 				db.session.add(new_upload_placeholder)
 				db.session.commit()
 
 				new_upload_id = new_upload_placeholder.id
 				new_request = RequestID(id=request_str, user_id=user.id, upload_id=new_upload_id)
-
 				db.session.add(new_request)
 				db.session.commit()
 
 				twilio_number = '+14153196892'
 
-				message = client.messages.create(body="%s is requesting an audio recording. When you are ready, please call %s with Twilio and have your request ID ready: %s!" % (user.first_name, twilio_number, request_str),
-				# print message
+				message = client.messages.create(body="%s is requesting an audio recording. When you are ready, please call %s with Twilio and have this request ID ready: %s!" % (user.first_name, twilio_number, request_str),
+
 				to='+1' + tel_number,    # number to send request
 				from_="+14153196892") # Twilio number
-				# print message.sid
 
 				request_number = request_str
 
@@ -250,14 +205,12 @@ def generate_request_str():
 
 				db.session.add(new_upload_placeholder)
 				db.session.commit()
-				print 'Added upload placeholder to db'
 
 				new_upload_id = new_upload_placeholder.id
 				new_request_url = RequestID(id=request_str, user_id=user.id, upload_id=new_upload_id)
 
 				db.session.add(new_request_url)
 				db.session.commit()
-				print 'Added request '
 
 				generated_url = request_str
 
@@ -274,105 +227,85 @@ def incoming_call():
 	
 	from_number = request.values.get('From', None)
 	request_url = request.values.get('')
-	print 'from number: ', from_number
 
 	resp = twilio.twiml.Response()
+
 	# Greet the caller
 	resp.say("Hello.")
 
 	# Gather digits.
 	with resp.gather(numDigits=5, action="/handle-key", method="POST") as g:
-		g.say("""To continue, please enter the five digit code included in the text message request you received.""")
-	print str(resp)
+		g.say("""Please enter the five digit code included in the text message request you received.""")
 	return str(resp)
 
 
 @app.route("/handle-key", methods=['GET', 'POST'])
 def handle_key():
 	"""Handle key press from a user."""
-	digits_pressed = request.values.get('Digits', None)
 
+	digits_pressed = request.values.get('Digits', None)
 	requestid = RequestID.query.filter_by(id=digits_pressed).first()
-	print 'Request: ', requestid
-	
+
 	resp = twilio.twiml.Response()
 
 	if requestid == None:
 		resp.say("Sorry. That request ID was not found. Please try again.")
+		return str(resp)
 		return redirect("/incoming")
 
 	else:
 		requested_story = Upload.query.filter_by(id=requestid.upload_id).first()
-		print 'Requested Story: ', requested_story
-		print 'Requested Story PATH: ', requested_story.path
-
 		user = User.query.filter_by(id=requested_story.user_id).first()
-		print 'User who made request: ', user
 
-		# if requested_story.path:
-		# 	print 'UPLOAD PATH EXISTS'
-		# 	resp.say("This request has expired. Goodbye.")
-		# 	return str(resp)
+		if requested_story.path:
+			resp.say("This request has already been submitted. Goodbye.")
+			return str(resp)
 
-		# else:
+		else:
 
-		call_sid = request.values.get("CallSid", None)
-		print '***CALL SID in handle-key: ', call_sid
+			call_sid = request.values.get("CallSid", None)
 
-		# add call_sid to Requests db
-		requestid.call_sid = call_sid
-		db.session.commit()
-		print 'Committed Call SID to db: ', requestid
-	
-		resp = twilio.twiml.Response()
-		resp.say("Thank you! %s is requesting a recording for %s. Start recording your story after the tone. After you are finished recording, press any key to confirm." % (user.first_name, requested_story.title))
-		resp.record(action="/handle-recording")
-		return str(resp)
+			# add call_sid to Requests db
+			requestid.call_sid = call_sid
+			db.session.commit()
+		
+			resp = twilio.twiml.Response()
+			resp.say("Thank you! %s is requesting a recording for %s. Start recording your story after the tone. After you are finished recording, press any key to confirm." % (user.first_name, requested_story.title))
+			resp.record(action="/handle-recording")
+			return str(resp)
 
 
 @app.route("/handle-recording", methods=['GET', 'POST'])
 def handle_recording():
 	"""Play back the caller's recording."""
 
-	recording_url = request.values.get("RecordingUrl", None)
-	print 'Recording URL: ', recording_url
-
-	recording_uri = requests.get(recording_url)
-	print 'Recording URI: ', recording_uri
-
 	call_sid = request.values.get("CallSid", None)
-	print '***Call Sid in handle-recording: ', call_sid
+	recording_url = request.values.get("RecordingUrl", None)
+	recording_uri = requests.get(recording_url)
+	recording_sid = request.values.get("RecordingSid", None)
 
 	requestid = RequestID.query.filter_by(call_sid=call_sid).first()
 	requested_story = Upload.query.filter_by(id=requestid.upload_id).first()
 	user = User.query.filter_by(id=requestid.user_id).first()
 
-	recording_sid = request.values.get("RecordingSid", None)
-	print 'RECORDING SID: ', recording_sid
 
 	resp = twilio.twiml.Response()
 	resp.say("Thanks for your story... take a listen.")
 	resp.play(recording_url)
 
 	resp.say("Goodbye.")
-	print 'This is the recording: ', recording_url
 
-	# save recording to S3
+	# save file to S3
 	k = b.new_key(recording_sid + '.wav')
-	# upload_file = StringIO(recording_url)
-	# print 'Upload file: ', upload_file
 	k.set_metadata('Content-Type', 'audio/wav')
 	k.set_contents_from_string(recording_uri.content)
-	k.set_acl('public-read') 
-	print 'Key: ', k.key, '; K: ', k
+	k.set_acl('public-read')
 
 	filename = recording_sid + '.wav'
 	requested_story.path = filename
 	db.session.commit()
-	print 'New recording %s to db' % filename
-
-	# delete recording from Twilio servers
-	# client.recordings.delete(recording_sid)
+	
+	client.recordings.delete(recording_sid) # delete from Twilio servers
 
 	return str(resp)
 
@@ -579,6 +512,35 @@ def requested_audio_page(id):
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 	return render_template("request_page.html", requested_obj=requested_obj)
+
+
+@app.route('/success')
+def success_message_record():
+	"""Flash a success message and redirect to user profile at submit."""
+	flash('Recording successfully submitted!')
+	return redirect('/profile')
+
+
+@app.route('/success-collection')
+def success_message_upload():
+	"""Flash a success message and redirect to user profile at submit."""
+	upload_id = request.args.get('UPLOAD_ID')
+	upload = Upload.query.get(upload_id)
+
+	collection_id = request.args.get('COLLECTION_ID')
+	collection = Collection.query.get(collection_id)
+
+	print 'UPLOAD ID: ', upload_id
+
+	flash('Upload %s added to collection %s!' % (upload.title, collection.title))
+	return redirect('/profile')
+
+
+@app.route('/thanks')
+def thanks_message_request():
+	"""Flash a success message and redirect to thank you page with info."""
+	flash('Recording successfully submitted!')
+	return render_template('thanks.html')
 
 
 @app.route('/login')
