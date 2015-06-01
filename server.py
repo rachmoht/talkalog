@@ -53,6 +53,7 @@ app.jinja_env.undefined = StrictUndefined
 
 def request_generator(size=5, chars=string.digits):
 	"""Generate numerical string for unique request ID."""
+
 	request_id = ''.join(random.choice(chars) for _ in range(size))
 	existing_request = RequestID.query.filter_by(id=request_id).first()
 
@@ -64,6 +65,7 @@ def request_generator(size=5, chars=string.digits):
 
 def str_generator(size=5, chars=string.ascii_uppercase + string.digits):
 	"""Generate string for creating unique filename."""
+
 	rand_str = ''.join(random.choice(chars) for _ in range(size))
 	existing_filename = Upload.query.filter_by(path=rand_str).first()
 
@@ -75,6 +77,7 @@ def str_generator(size=5, chars=string.ascii_uppercase + string.digits):
 
 def is_allowed_file(filename):
 	"""Check that file created by audio has allowed extension."""
+
 	return '.' in filename and \
 		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -82,12 +85,14 @@ def is_allowed_file(filename):
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
 	"""Serve up files from the /uploads folder."""
+
 	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/')
 def index():
 	"""Home."""
+
 	if 'email' in session: 
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
@@ -261,7 +266,6 @@ def handle_key():
 			return str(resp)
 
 		else:
-
 			call_sid = request.values.get("CallSid", None)
 
 			# add call_sid to Requests db
@@ -287,7 +291,6 @@ def handle_recording():
 	requested_story = Upload.query.filter_by(id=requestid.upload_id).first()
 	user = User.query.filter_by(id=requestid.user_id).first()
 
-
 	resp = twilio.twiml.Response()
 	resp.say("Thanks for your story... take a listen.")
 	resp.play(recording_url)
@@ -304,7 +307,8 @@ def handle_recording():
 	requested_story.path = filename
 	db.session.commit()
 	
-	client.recordings.delete(recording_sid) # delete from Twilio servers
+	# delete from Twilio servers
+	client.recordings.delete(recording_sid)
 
 	return str(resp)
 
@@ -313,32 +317,29 @@ def handle_recording():
 def listen_audio(id):
 	"""Show more information about the single user logged in."""
 
-	if 'email' in session: # if logged in
+	if 'email' in session: 
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
 		this_file = Upload.query.filter_by(id=id).first()
-		# full_filename = urllib2.urlopen(UPLOAD_FOLDER + '/' + this_file.path)
-		open_file = urllib2.urlopen('https://s3.amazonaws.com/radhackbright/REc2c050b4431425bad1e81093c9bd2487.wav')
+		# open_filename = urllib2.urlopen(UPLOAD_FOLDER + '/' + this_file.path)
+		open_file = urllib2.urlopen('https://s3.amazonaws.com/radhackbright/REc2c050b4431425bad1e81093c9bd2487.wav') # hardcoded for testing
 
-		# print '**** Transcript? ', this_file.transcript
-		# print 'URL: ', open_file
-		# print 'Recording info: r', open_file.read(100)
+		# TODO: Fix FLAC issue
+		# if this_file.transcript == None:
 
-		if this_file.transcript == None:
+		# 	r = sr.Recognizer()
+		# 	with sr.WavFile(open_file) as source:   
+		# 		# extract audio data from the file           
+		# 		audio = r.record(source)                        
 
-			r = sr.Recognizer()
-			with sr.WavFile(open_file) as source:              # use "test.wav" as the audio source
-				audio = r.record(source)                        # extract audio data from the file
-
-			try:
-				print("Transcription: " + r.recognize(audio))   # recognize speech using Google Speech Recognition
-			except LookupError:                                 # speech is unintelligible
-				print("Could not understand audio")
-
-
-
-
+		# 	try:
+		# 		# recognize speech using Google Speech Recognition
+		# 		print("Transcription: " + r.recognize(audio))   
+				
+		# 	except LookupError:     
+		# 		# speech is unintelligible                            
+		# 		print("Could not understand audio")
 
 		# check if upload belongs to a collection
 		cu = this_file.collectionsuploads
@@ -347,15 +348,11 @@ def listen_audio(id):
 		collection = [cu.collection for cu in cu]
 		print 'This is the parent collection: ', collection
 
-		# create list of user collectionuploads
 		collect_users = []
 		for c in collection:
-
 			for i in c.collectionsusers:
 				print 'what is i', i
 				collect_users.append(i.user_id)
-
-		print 'These are the users with access: ', collect_users
 
 		if (this_file.user_id == user.id) or (user.id in collect_users):
 			return render_template('listen.html', user=user, upload=this_file, upload_folder=UPLOAD_FOLDER)
@@ -369,12 +366,11 @@ def listen_audio(id):
 		return redirect('/')
 
 
-
 @app.route('/collection/<int:id>')
 def collection_page(id):
 	"""Show more information about a collection."""
 
-	if 'email' in session: # if logged in
+	if 'email' in session:
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
@@ -385,28 +381,40 @@ def collection_page(id):
 
 		# get list of users with permission for viewing collection
 		collectionusers = CollectionsUsers.query.filter_by(collection_id=id).all()
+		print 'ALLOWED USERS: ', collectionusers
 
-		# TODO: check for user permissions before rendering template
-		return render_template('collection.html', user=user, collection=this_collection, uploads=uploads)
+		user_permissions = []
+		for u in collectionusers:
+			user_permissions.append(u.user_id)
+
+		print 'list of user id: ', user_permissions
+
+		if (this_collection.user_id == user.id) or (user.id in user_permissions):
+			return render_template('collection.html', user=user, collection=this_collection, uploads=uploads)
+		
+		else:
+			flash('You don\'t have access to view this page')
+			return redirect('/')
 
 	else:
-		flash('You don\'t have access to view this page')
+		flash('You must be logged in to view this page')
 		return redirect('/')
 
 
 @app.route('/add/<int:id>', methods=['GET', 'POST'])
 def add_to_collection(id):
 	"""Add an existing upload to a collection."""
-	print 'ADD TO COLLECTION *************'
+
 	upload_id = id
-	if 'email' in session: # if logged in
+
+	if 'email' in session:
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
 		this_collection = request.form['collection']
 		existing_collection = Collection.query.filter_by(title=this_collection, user_id=user.id).first()
 
-		if existing_collection == None: # if no collection exists of the same name from this user, create one
+		if existing_collection == None: 
 			new_collection = Collection(title=this_collection, user_id=user.id)
 			db.session.add(new_collection)
 			db.session.commit()
@@ -447,7 +455,7 @@ def add_upload_to_collection(id):
 	collection_id = request.form.get('collection_id')
 	collection = Collection.query.get(collection_id)
 
-	if 'email' in session: # if logged in
+	if 'email' in session: 
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
@@ -484,11 +492,10 @@ def add_upload_to_collection(id):
 @app.route('/share/<int:id>', methods=['GET', 'POST'])
 def share_collection(id):
 	"""Share a collection with another user by email address."""
-	print 'SHARING COLLECTION *************'
 
 	collection_id = id
 
-	if 'email' in session: # if logged in
+	if 'email' in session: 
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
@@ -513,9 +520,9 @@ def share_collection(id):
 @app.route('/request/<string:id>', methods=['GET', 'POST'])
 def requested_audio_page(id):
 	"""Show more information about the single user logged in."""
+
 	requested_obj = Request.query.get(id)
 	assoc_upload = Upload.query.get(requested_obj.upload_id)
-	print assoc_upload
 
 	if request.method == 'POST':
 		file = request.files['file']
@@ -546,6 +553,7 @@ def requested_audio_page(id):
 @app.route('/success')
 def success_message_record():
 	"""Flash a success message and redirect to user profile at submit."""
+
 	flash('Recording successfully submitted!')
 	return redirect('/profile')
 
@@ -553,13 +561,12 @@ def success_message_record():
 @app.route('/success-collection')
 def success_message_upload():
 	"""Flash a success message and redirect to user profile at submit."""
+
 	upload_id = request.args.get('UPLOAD_ID')
 	upload = Upload.query.get(upload_id)
 
 	collection_id = request.args.get('COLLECTION_ID')
 	collection = Collection.query.get(collection_id)
-
-	print 'UPLOAD ID: ', upload_id
 
 	flash('Upload %s added to collection %s!' % (upload.title, collection.title))
 	return redirect('/profile')
@@ -568,6 +575,7 @@ def success_message_upload():
 @app.route('/thanks')
 def thanks_message_request():
 	"""Flash a success message and redirect to thank you page with info."""
+
 	flash('Recording successfully submitted!')
 	return render_template('thanks.html')
 
@@ -586,7 +594,6 @@ def login_process():
 	entered_email = request.form['email']
 	entered_pw = request.form['password']
 
-	# check db for user
 	user = User.query.filter_by(email=entered_email).first()
 	
 	if user != None:
@@ -595,9 +602,11 @@ def login_process():
 			print 'Session: ', session
 			flash('You successfully logged in as %s!' % session['email'])
 			return redirect("/profile")
+
 		else:
 			flash("That is not the correct password!")
 			return redirect('/login')
+
 	else:
 		flash("No existing account for %s" % entered_email)
 		return redirect('/signup')
@@ -620,25 +629,24 @@ def signup_process():
 	entered_pw = request.form['password']
 	entered_pw2 = request.form['password2']
 
-	# check db if existing user email
 	user = User.query.filter_by(email=entered_email).first()
 
 	if request.method == "POST":
-		# if no existing user, add to db
 		if user == None: 
 			if entered_pw != entered_pw2:  
 				flash("Your passwords did not match")
 				return redirect("/signup")
+			
 			else:
-				#update password into database
+				# update password into database
 				new_user = User(email= entered_email, password = entered_pw, first_name=entered_fname, last_name=entered_lname) 
 				db.session.add(new_user)
 				db.session.commit()
-				print 'creating new user in Database.'
-				print new_user, new_user.id
+
 				session['email'] = entered_email
 				flash("You are signed up %s!" % entered_email) 
 				return redirect("/")
+
 		else: 
 			flash("You have already signed up with that email")
 			return redirect('/login')
