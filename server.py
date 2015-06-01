@@ -35,8 +35,6 @@ conn = S3Connection()
 c = boto.connect_s3()
 b = c.get_bucket('radhackbright')
 
-# Required for saving our wav files to our server @ uploads/
-# TODO: modify upload folder to point to s3, but still mask as upload/
 UPLOAD_FOLDER = 'https://s3.amazonaws.com/radhackbright'
 ALLOWED_EXTENSIONS = set(['wav'])
 
@@ -46,26 +44,23 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
 
-# Normally, if you use an undefined variable in Jinja2, it fails silently.
-# This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
 
 def request_generator(size=5, chars=string.digits):
+	"""Generate numerical string for unique request ID."""
 	request_id = ''.join(random.choice(chars) for _ in range(size))
-	print request_id
 	existing_request = RequestID.query.filter_by(id=request_id).first()
 
-	while existing_request == None:
+	while existing_request == None: 
 		return request_id
 
 	request_id = ''.join(random.choice(chars) for _ in range(size))
 
 
 def str_generator(size=5, chars=string.ascii_uppercase + string.digits):
+	"""Generate string for creating unique filename."""
 	rand_str = ''.join(random.choice(chars) for _ in range(size))
-	print rand_str
-	# TODO: check to make sure this filename string does not already exist
 	existing_filename = Upload.query.filter_by(path=rand_str).first()
 
 	while existing_filename == None:
@@ -94,14 +89,14 @@ def index():
 		user = User.query.filter_by(email=user_email).first()
 		return redirect('/profile')
 	else:
-		return render_template('homepage.html')
+		return render_template('home.html')
 
 
 @app.route('/profile')
 def user_page():
 	"""Show more information about the single user logged in."""
 
-	if 'email' in session: # if logged in
+	if 'email' in session:
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
 
@@ -121,7 +116,7 @@ def user_page():
 			if i.id not in user_cu:
 				singleuploads.append(i)
 
-		return render_template("profile.html", user=user, singleuploads=singleuploads)
+		return render_template("profile.html", user=user, singleuploads=singleuploads, upload_folder=UPLOAD_FOLDER)
 
 	else:
 		flash('You must be logged in to view files')
@@ -190,7 +185,7 @@ def generate_request_str():
 
 				message = client.messages.create(body="%s is requesting an audio recording. When you are ready, please call %s with Twilio and have this request ID ready: %s!" % (user.first_name, twilio_number, request_str),
 
-				to='+1' + tel_number,    # number to send request
+				to='+1' + tel_number, # number to send request
 				from_="+14153196892") # Twilio number
 
 				request_number = request_str
@@ -230,10 +225,10 @@ def incoming_call():
 
 	resp = twilio.twiml.Response()
 
-	# Greet the caller
+	# greet the caller
 	resp.say("Hello.")
 
-	# Gather digits.
+	# gather digits
 	with resp.gather(numDigits=5, action="/handle-key", method="POST") as g:
 		g.say("""Please enter the five digit code included in the text message request you received.""")
 	return str(resp)
@@ -317,28 +312,37 @@ def listen_audio(id):
 	if 'email' in session: # if logged in
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
-		print "User ID of this user: ", user.id
 
 		this_file = Upload.query.filter_by(id=id).first()
-		print "User ID of this file: ", this_file.id
 
-		# check if upload belongs to a collection,
-		# to check if other users have permission for collection
-		# other users inherit the permission for individual audio file
-		parent_collections = this_file.collectionsuploads
-		print "*******This upload belongs to: ", parent_collections
+		# check if upload belongs to a collection
+		cu = this_file.collectionsuploads
+		print 'CollectionsUploads: ', cu
 
-		# TODO: check for user permissions before rendering template ::
-		# from collections uploads, get collection id
-		# from collection id, find collectionsusers
-		# from collectionsusers find all users
-		# check if logged in user id is in this list for access
-		if this_file.user_id == user.id:
+		collection = [cu.collection for cu in cu]
+		print 'This is the parent collection: ', collection
+
+		# create list of user collectionuploads
+		collect_users = []
+		for c in collection:
+
+			for i in c.collectionsusers:
+				print 'what is i', i
+				collect_users.append(i.user_id)
+
+		print 'These are the users with access: ', collect_users
+
+		if (this_file.user_id == user.id) or (user.id in collect_users):
 			return render_template('listen.html', user=user, upload=this_file, upload_folder=UPLOAD_FOLDER)
 
 		else:
 			flash('You don\'t have access to view this page')
 			return redirect('/')
+
+	else:
+		flash('You must be logged in to access this page.')
+		return redirect('/')
+
 
 
 @app.route('/collection/<int:id>')
@@ -620,15 +624,15 @@ def process_logout():
     """Route to process logout for users."""
 
     session.pop('email')
-
-    flash('You successfully logged out!')
+	
+	flash("You have successfully logged out.")
     return redirect("/")
 
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    app.debug = True
+    app.debug = False
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
     connect_to_db(app)

@@ -1,19 +1,24 @@
-{% extends 'base.html' %}
+{% extends 'home.html' %}
 {% block content %}
-  <div class="jumbotron">
-      <h1>Audio Project | Log In</h1>
-      <form action="/login-process" method="POST">
-        <div class="form-group">
-        <label>Email: 
-        <input type="email" class="form-control" name="email" placeholder="name@domain.com">
-        </label>
-        </div>
-        <div class="form-group">
-        <label>Password:
-        <input type="password" class="form-control" name="password">
-        </label>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <h5>Site News Lorem Ipsum</h5>
+        <p>Welcome back, lorem ipsum.</p>
       </div>
-      <input type="submit" value="Log In" class="btn btn-default btn-lg">
-      </form>
+      <div class="col-sm-6">
+        <form action="/login-process" method="POST">
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" name="email" placeholder="name@domain.com">
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" name="password">
+          </div>
+          <input type="submit" value="Log In" class="btn btn-default">
+        </form>
+      </div>
+    </div>
   </div>
 {% endblock %}

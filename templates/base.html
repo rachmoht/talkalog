@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/style.css"/>
 
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -30,7 +30,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">Audio</a>
+          <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Talkalog</a>
         </div>
 
 
@@ -57,17 +57,24 @@
       </div><!-- /.container-fluid -->
     </nav>
 
-    <div class="container">
-      <!-- Show flashed messages -->
-      {% with messages = get_flashed_messages() %}
-        {% for message in messages %}
-            <div class="alert alert-warning">{{ message }}</div>
-        {% endfor %}
-      {% endwith %}
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+        <div class="container">
+          <div class="alert alert-warning">{{ message }}</div>
+        </div>
+      {% endfor %}
+    {% endwith %}
 
+    <div class="container">
     	{% block content %}
     		<!-- Content here -->
     	{% endblock %}
+    </div>
+
+    <div class="container">
+      <footer class="footer">
+        <p>© Company 2014</p>
+      </footer>
     </div>
   </body>
 </html>

@@ -1,19 +1,43 @@
 {% extends 'base.html' %}
 {% block content %}
-	<div class="jumbotron">
-	    <h1>Audio Project</h1>
-	    <form action="/login-process" method="POST">
-	    	<div class="form-group">
-				<label>Email: 
-				<input type="email" class="form-control" name="email" placeholder="name@domain.com">
-				</label>
-	    	</div>
-	    	<div class="form-group">
-				<label>Password:
-				<input type="password" class="form-control" name="password">
-				</label>
-			</div>
-			<input type="submit" value="Log In" class="btn btn-default btn-lg">
-	    </form>
 	</div>
+	<div class="jumbotron">
+      <div class="container text-center">
+        <h1>Talkalog</h1>
+        <h6>Destination memos and audio blogging on-the-go.</h6>
+
+        <p><a class="btn btn-default btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-sm-4">
+          <h4>Audio Heirlooms</h4>
+          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+       </div>
+        <div class="col-sm-4">
+          <h4>On the Web, Over the Phone</h4>
+          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+       </div>
+        <div class="col-sm-4">
+          	<h4>Log In</h4>
+			<form action="/login-process" method="POST">
+				<div class="form-group">
+					<label for="email">Email:</label>
+					<input type="email" class="form-control" name="email" placeholder="name@domain.com">
+				</div>
+				<div class="form-group">
+					<label for="password">Password:</label>
+					<input type="password" class="form-control" name="password">
+				</div>
+				<input type="submit" value="Log In" class="btn btn-default">
+			</form>
+        </div>
+      </div>
+    </div> <!-- /container -->
+    <div>
 {% endblock %}

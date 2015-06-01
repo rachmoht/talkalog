@@ -1,3 +1,8 @@
+body {
+  background-color: #E6E3DD;
+  color: #565a5c;
+}
+
 .navbar-default {
   background-color: #C13561;
   /*background-image: -webkit-linear-gradient(-360deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);
@@ -11,11 +16,38 @@
   color: #fff;
 }
 
-body {
-  background-color: #E6E3DD;
-  color: #705E40;
+.navbar {
+  margin-bottom: 0;
 }
 
+nav.navbar-home.navbar-default {
+  background-color: transparent;
+  margin-bottom: 48px;
+}
+
+.alert {
+  margin: 20px auto;
+}
+
+.jumbotron {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: auto 300%;
+  background-color: transparent;
+  color: white;
+  padding: 0 0 80px;
+}
+
+.jumbotron a.btn.btn-default.btn-lg {
+  background-color: rgba(255,255,255,0.8);
+}
+
+.footer {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  margin-top: 40px;
+  border-top: 1px solid #eee;
+}
 
 #recordingslist audio { 
   display: block; margin-bottom: 10px; 
@@ -36,11 +68,6 @@ body {
   text-align: left;
   min-height: 150px;
 }
-
-.jumbotron {
-  background-color: rgba(0,0,0,0.1);
-}
-
 .list-group-heading {
   background-color: #afa797;
   color: #fff;

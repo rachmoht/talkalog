@@ -35,13 +35,30 @@
                                 'collection_id': collectionId 
                             } 
                         }).done(function(data) {
-                            alert("/success-collection?UPLOAD_ID="+uploadId+"&COLLECTION_ID="+collectionId);
                             window.location.href = "/success-collection?UPLOAD_ID="+uploadId+"&COLLECTION_ID="+collectionId;
                         });
                     }
                 });
             })
         });
+    </script>
+    <script>
+    window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+    t._e.push(f);
+    };
+
+    return t;
+    }(document, "script", "twitter-wjs"));
     </script>
 
     <h2>Welcome, {{ user.first_name }}</h2>
@@ -87,7 +104,9 @@
                         <li class="draggable upload list-group-item row" upload-id="{{ cu.upload.id }}">
                             <div class="name col-sm-6"><a href="/listen/{{ cu.upload.id }}">{{ cu.upload.title }}</a></div>
                             <div class="type col-sm-3">Audio File</div>
-                            <div class="share col-sm-3">Share Social</div>
+                            <div class="share col-sm-3">
+                                <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{ cu.upload.title }}" url="{{ cu.upload.path }}" data-size="default">Tweet</a>
+                            </div>
                         </li>
                     {% endfor %}
                 {% endfor %}
@@ -105,7 +124,9 @@
                     <li class="draggable upload list-group-item row" upload-id="{{ upload.id }}">
                         <div class="name col-sm-6"><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></div>
                         <div class="type col-sm-3">Audio File</div>
-                        <div class="share col-sm-3">Share Social</div>
+                        <div class="share col-sm-3">
+                            <a class="twitter-share-button" href="https://twitter.com/intent/tweet?url={{ upload_folder }}/{{ upload.path }}&text={{ upload.title }}" data-size="default">Tweet</a>
+                        </div>
                     </li> 
                 {% endif %}         
             {% endfor %}
