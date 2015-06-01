@@ -16,6 +16,10 @@ import requests
 import twilio.twiml
 from twilio.rest import TwilioRestClient
 
+import speech_recognition as sr
+import urllib2
+import wave
+
 from model import User, Upload, Collection, RequestID, CollectionsUsers, CollectionsUploads, connect_to_db, db
 
 import boto
@@ -314,6 +318,27 @@ def listen_audio(id):
 		user = User.query.filter_by(email=user_email).first()
 
 		this_file = Upload.query.filter_by(id=id).first()
+		# full_filename = urllib2.urlopen(UPLOAD_FOLDER + '/' + this_file.path)
+		open_file = urllib2.urlopen('https://s3.amazonaws.com/radhackbright/REc2c050b4431425bad1e81093c9bd2487.wav')
+
+		# print '**** Transcript? ', this_file.transcript
+		# print 'URL: ', open_file
+		# print 'Recording info: r', open_file.read(100)
+
+		if this_file.transcript == None:
+
+			r = sr.Recognizer()
+			with sr.WavFile(open_file) as source:              # use "test.wav" as the audio source
+				audio = r.record(source)                        # extract audio data from the file
+
+			try:
+				print("Transcription: " + r.recognize(audio))   # recognize speech using Google Speech Recognition
+			except LookupError:                                 # speech is unintelligible
+				print("Could not understand audio")
+
+
+
+
 
 		# check if upload belongs to a collection
 		cu = this_file.collectionsuploads
@@ -621,18 +646,18 @@ def signup_process():
 
 @app.route("/logout")
 def process_logout():
-    """Route to process logout for users."""
+	"""Route to process logout for users."""
 
-    session.pop('email')
-	
+	session.pop('email')
+
 	flash("You have successfully logged out.")
-    return redirect("/")
+	return redirect("/")
 
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    app.debug = False
+    app.debug = True
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
     connect_to_db(app)
