@@ -43,26 +43,55 @@
         });
     </script>
     <script>
-    window.twttr = (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0],
-    t = window.twttr || {};
-    if (d.getElementById(id)) return t;
-    js = d.createElement(s);
-    js.id = id;
-    js.src = "https://platform.twitter.com/widgets.js";
-    fjs.parentNode.insertBefore(js, fjs);
+        $(function(){
 
-    t._e = [];
-    t.ready = function(f) {
-    t._e.push(f);
-    };
+            $('.editable').click(function(e){  
+                var uploadId = $(e).attr('upload-id');
 
-    return t;
-    }(document, "script", "twitter-wjs"));
+                console.log('the id to edit: ' + uploadId);
+
+                $('#upload-' + uploadId).editable({
+                    url: '/edit/title/' + $('.upload-title').attr('upload-id'),
+                    title: 'Edit Title',
+                    pk: 1,
+                    toggle: 'manual',
+                    params: function(params) {
+                        var data = {};
+                        data['id'] = params.pk;
+                        data['name'] = params.value;
+                        return data;
+                    }
+                });
+
+
+                e.stopPropagation();
+                console.log($('.upload-title').attr('upload-id'))
+                $('.upload-title').editable('toggle');
+            });
+
+        });
+    </script>
+    <script>
+        window.twttr = (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {};
+        if (d.getElementById(id)) return t;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+
+        t._e = [];
+        t.ready = function(f) {
+        t._e.push(f);
+        };
+
+        return t;
+        }(document, "script", "twitter-wjs"));
     </script>
 
     <h2>Welcome, {{ user.first_name }}</h2>
-    <p>{{ user.first_name }} {{ user.last_name }} | User ID: {{ user.id }} | {{ user.email }}</p>
+    <p>{{ user.first_name }} {{ user.last_name }} | User ID: {{ user.id }} | {{ user.email }} | {{ user.tel }}</p>
 
     <hr>
 
@@ -102,10 +131,17 @@
                     </li>
                     {% for cu in collection.collectionsuploads %}
                         <li class="draggable upload list-group-item row" upload-id="{{ cu.upload.id }}">
-                            <div class="name col-sm-6"><a href="/listen/{{ cu.upload.id }}">{{ cu.upload.title }}</a></div>
+                            <div class="name col-sm-6">
+                                <div class="control-group control-group-inline">
+                                    <div class="controls">
+                                        <a href="/listen/{{ cu.upload.id }}" class="upload-title" data-toggle=".pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}" id="upload-{{ cu.upload.id }}">{{ cu.upload.title }}</a> 
+                                        <span class="edit pencil-{{ cu.upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="type col-sm-3">Audio File</div>
                             <div class="share col-sm-3">
-                                <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{ cu.upload.title }}" url="{{ cu.upload.path }}" data-size="default">Tweet</a>
+                                Share
                             </div>
                         </li>
                     {% endfor %}
@@ -122,10 +158,18 @@
             {% for upload in singleuploads %}
                 {% if upload.path %}
                     <li class="draggable upload list-group-item row" upload-id="{{ upload.id }}">
-                        <div class="name col-sm-6"><a href="/listen/{{ upload.id }}">{{ upload.title }}</a></div>
+                        <div class="name col-sm-6">
+                            <div class="control-group control-group-inline">
+                                <div class="controls">
+                                    <a href="/listen/{{ upload.id }}" class="upload-title" data-toggle=".pencil-{{ upload.id }}" upload-id="{{ upload.id }}" id="upload-{{ upload.id }}">{{ upload.title }}</a> 
+                                    <span class="edit pencil-{{ upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="type col-sm-3">Audio File</div>
                         <div class="share col-sm-3">
-                            <a class="twitter-share-button" href="https://twitter.com/intent/tweet?url={{ upload_folder }}/{{ upload.path }}&text={{ upload.title }}" data-size="default">Tweet</a>
+                            Share
                         </div>
                     </li> 
                 {% endif %}         

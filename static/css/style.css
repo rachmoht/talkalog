@@ -74,10 +74,10 @@ nav.navbar-home.navbar-default {
 }
 
 .draggable {
-  background: url('/static/img/drag-drop.png') no-repeat 10px center rgba(255,255,255,0.7);
+  background: url('/static/img/drag-drop.png') no-repeat 10px center / 10px auto rgba(255,255,255,0.7);
   clear: both;
   display: block;
-  min-height: 61px;
+  min-height: 40px;
   padding-left: 30px;
 }
 
@@ -88,4 +88,19 @@ nav.navbar-home.navbar-default {
 .collection {
   background-color: #efefef !important;
   padding-left: 30px;
+}
+
+.click-to-edit {
+  font-size: 70%;
+  vertical-align: baseline;
+  padding: 0 5px;
+  color: #ccc;
+}
+
+.click-to-edit:hover {
+  font-size: 70%;
+  vertical-align: baseline;
+  padding: 0 5px;
+  color: #565a5c;
+  cursor: pointer;
 }

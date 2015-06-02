@@ -22,6 +22,7 @@ class User(db.Model):
     password = db.Column(db.String(50), nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
+    tel = db.Column(db.String, nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -37,7 +38,7 @@ class Upload(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
-    title = db.Column(db.String, nullable=False, default='Untitled')
+    title = db.Column(db.String, nullable=False, default=db.func.now())
     path = db.Column(db.String(50))
     mimetype = db.Column(db.String(50), default='wav') # wav, jpg, mp3
     datetime = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now()) # set datetime to current timestamp

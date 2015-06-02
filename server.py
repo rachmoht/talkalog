@@ -2,7 +2,8 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, redirect, request, flash, session, url_for, send_from_directory
+from flask import Flask, render_template, redirect, request, flash, session
+from flask import url_for, send_from_directory, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
 from werkzeug import secure_filename
@@ -18,9 +19,9 @@ from twilio.rest import TwilioRestClient
 
 import speech_recognition as sr
 import urllib2
-import wave
 
-from model import User, Upload, Collection, RequestID, CollectionsUsers, CollectionsUploads, connect_to_db, db
+from model import User, Upload, Collection, RequestID, CollectionsUsers
+from model import CollectionsUploads, connect_to_db, db
 
 import boto
 from boto.s3.connection import S3Connection
@@ -125,7 +126,8 @@ def user_page():
 			if i.id not in user_cu:
 				singleuploads.append(i)
 
-		return render_template("profile.html", user=user, singleuploads=singleuploads, upload_folder=UPLOAD_FOLDER)
+		return render_template("profile.html", user=user,
+			singleuploads=singleuploads, upload_folder=UPLOAD_FOLDER)
 
 	else:
 		flash('You must be logged in to view files')
@@ -147,7 +149,8 @@ def record_audio():
 
 			if file:
 				filename = str_generator(30) + '.wav'
-				new_recording = Upload(user_id=user.id, title=title, path=filename, transcript=transcript)
+				new_recording = Upload(user_id=user.id, title=title,
+					path=filename, transcript=transcript)
 				db.session.add(new_recording)
 				db.session.commit()
 
@@ -186,13 +189,17 @@ def generate_request_str():
 				db.session.commit()
 
 				new_upload_id = new_upload_placeholder.id
-				new_request = RequestID(id=request_str, user_id=user.id, upload_id=new_upload_id)
+				new_request = RequestID(id=request_str, user_id=user.id, 
+					upload_id=new_upload_id)
 				db.session.add(new_request)
 				db.session.commit()
 
 				twilio_number = '+14153196892'
 
-				message = client.messages.create(body="%s is requesting an audio recording. When you are ready, please call %s with Twilio and have this request ID ready: %s!" % (user.first_name, twilio_number, request_str),
+				message = client.messages.create(body="""%s is requesting an 
+					audio recording. When you are ready, please call %s with
+					Twilio and have this request ID ready: %s!""" % 
+					(user.first_name, twilio_number, request_str),
 
 				to='+1' + tel_number, # number to send request
 				from_="+14153196892") # Twilio number
@@ -211,7 +218,8 @@ def generate_request_str():
 				db.session.commit()
 
 				new_upload_id = new_upload_placeholder.id
-				new_request_url = RequestID(id=request_str, user_id=user.id, upload_id=new_upload_id)
+				new_request_url = RequestID(id=request_str, user_id=user.id,
+					upload_id=new_upload_id)
 
 				db.session.add(new_request_url)
 				db.session.commit()
@@ -222,7 +230,8 @@ def generate_request_str():
 		flash('You must be logged in to generate request URL!')
 		return redirect('/login')
 
-	return render_template("generate.html", generated_url=generated_url, request_number=request_number)
+	return render_template("generate.html", generated_url=generated_url,
+		request_number=request_number)
 
 
 @app.route("/incoming", methods=['GET', 'POST'])
@@ -230,17 +239,55 @@ def incoming_call():
 	"""Respond to incoming requests via Twilio call."""
 	
 	from_number = request.values.get('From', None)
-	request_url = request.values.get('')
+	print 'Number: ', from_number
+	call_sid = request.values.get("CallSid", None)
+
+	# check if this is a user number
+	from_number = from_number.replace('+1', '')
+	print from_number
+	user = User.query.filter_by(tel=from_number).first()
+	print user
 
 	resp = twilio.twiml.Response()
 
-	# greet the caller
-	resp.say("Hello.")
+	if user != None:
+		# greet the caller
+		resp.say("Hello, %s." % user.first_name)
 
-	# gather digits
-	with resp.gather(numDigits=5, action="/handle-key", method="POST") as g:
-		g.say("""Please enter the five digit code included in the text message request you received.""")
-	return str(resp)
+		resp.say("""Start recording your story after the tone. 
+			After you are finished recording, press any key to confirm.""")
+
+		request_str = request_generator()
+		new_upload_placeholder = Upload(user_id=user.id)
+		db.session.add(new_upload_placeholder)
+		db.session.commit()
+		print new_upload_placeholder
+
+		new_upload_id = new_upload_placeholder.id
+		new_request = RequestID(id=request_str, user_id=user.id, 
+								upload_id=new_upload_id, call_sid=call_sid)
+		db.session.add(new_request)
+		db.session.commit()
+		print new_request
+
+		message = client.messages.create(body="""Your story ID is %s.""" % 
+		(request_str),
+
+		to='+1' + user.tel, # number to send request
+		from_="+14153196892") # Twilio number
+
+		resp.record(action="/handle-user-recording")
+		return str(resp)
+
+	else: 
+		# greet the caller
+		resp.say("Hello.")
+
+		# gather digits
+		with resp.gather(numDigits=5, action="/handle-key", method="POST") as g:
+			g.say("""Please enter the five digit code included in the text message
+				request you received.""")
+		return str(resp)
 
 
 @app.route("/handle-key", methods=['GET', 'POST'])
@@ -273,13 +320,51 @@ def handle_key():
 			db.session.commit()
 		
 			resp = twilio.twiml.Response()
-			resp.say("Thank you! %s is requesting a recording for %s. Start recording your story after the tone. After you are finished recording, press any key to confirm." % (user.first_name, requested_story.title))
-			resp.record(action="/handle-recording")
+			resp.say("""Thank you! %s is requesting a recording for %s. Start
+				recording your story after the tone. After you are finished
+				recording, press any key to confirm.""" %
+				(user.first_name, requested_story.title))
+			resp.record(action="/handle-requested-ecording")
 			return str(resp)
 
 
-@app.route("/handle-recording", methods=['GET', 'POST'])
-def handle_recording():
+@app.route("/handle-user-recording", methods=['GET', 'POST'])
+def handle_user_recording():
+	"""Play back the user's recording."""
+
+	call_sid = request.values.get("CallSid", None)
+	recording_url = request.values.get("RecordingUrl", None)
+	recording_uri = requests.get(recording_url)
+	recording_sid = request.values.get("RecordingSid", None)
+
+	requestid = RequestID.query.filter_by(call_sid=call_sid).first()
+	requested_story = Upload.query.filter_by(id=requestid.upload_id).first()
+	user = User.query.filter_by(id=requestid.user_id).first()
+
+	resp = twilio.twiml.Response()
+	resp.say("Thanks for your story... take a listen.")
+	resp.play(recording_url)
+
+	resp.say("Goodbye.")
+
+	# save file to S3
+	k = b.new_key(recording_sid + '.wav')
+	k.set_metadata('Content-Type', 'audio/wav')
+	k.set_contents_from_string(recording_uri.content)
+	k.set_acl('public-read')
+
+	filename = recording_sid + '.wav'
+	requested_story.path = filename
+	db.session.commit()
+	
+	# delete from Twilio servers
+	client.recordings.delete(recording_sid)
+
+	return str(resp)
+
+
+@app.route("/handle-requested-recording", methods=['GET', 'POST'])
+def handle_requested_recording():
 	"""Play back the caller's recording."""
 
 	call_sid = request.values.get("CallSid", None)
@@ -322,24 +407,32 @@ def listen_audio(id):
 		user = User.query.filter_by(email=user_email).first()
 
 		this_file = Upload.query.filter_by(id=id).first()
-		# open_filename = urllib2.urlopen(UPLOAD_FOLDER + '/' + this_file.path)
-		open_file = urllib2.urlopen('https://s3.amazonaws.com/radhackbright/REc2c050b4431425bad1e81093c9bd2487.wav') # hardcoded for testing
-
+		open_filename = urllib2.urlopen(UPLOAD_FOLDER + '/' + this_file.path)
+		# hardcoded for testing
+		# open_file = urllib2.urlopen('https://s3.amazonaws.com/radhackbright/REc2c050b4431425bad1e81093c9bd2487.wav') 
+		filename = this_file.path
+		filename = filename.replace(".wav", ".flac")
+		print 'Filename as FLAC: ', filename
+		
 		# TODO: Fix FLAC issue
-		# if this_file.transcript == None:
+		if this_file.transcript == None:
 
-		# 	r = sr.Recognizer()
-		# 	with sr.WavFile(open_file) as source:   
-		# 		# extract audio data from the file           
-		# 		audio = r.record(source)                        
+			r = sr.Recognizer()
+			with sr.WavFile(open_file) as source:   
+				# extract audio data from the file           
+				audio = r.record(source)                        
 
-		# 	try:
-		# 		# recognize speech using Google Speech Recognition
-		# 		print("Transcription: " + r.recognize(audio))   
-				
-		# 	except LookupError:     
-		# 		# speech is unintelligible                            
-		# 		print("Could not understand audio")
+			try:
+				# recognize speech using Google Speech Recognition
+				print("Transcription: " + r.recognize(audio))   
+				generated_transcript = r.recognize(audio)
+
+				this_file.transcript = generated_transcript
+				db.session.commit()
+
+			except LookupError:     
+				# speech is unintelligible                            
+				print("Could not understand audio")
 
 		# check if upload belongs to a collection
 		cu = this_file.collectionsuploads
@@ -355,7 +448,8 @@ def listen_audio(id):
 				collect_users.append(i.user_id)
 
 		if (this_file.user_id == user.id) or (user.id in collect_users):
-			return render_template('listen.html', user=user, upload=this_file, upload_folder=UPLOAD_FOLDER)
+			return render_template('listen.html', user=user, upload=this_file,
+				upload_folder=UPLOAD_FOLDER)
 
 		else:
 			flash('You don\'t have access to view this page')
@@ -364,6 +458,34 @@ def listen_audio(id):
 	else:
 		flash('You must be logged in to access this page.')
 		return redirect('/')
+
+
+@app.route('/edit/title/<int:id>', methods=['GET', 'POST'])
+def edit_title(id):
+	"""Edit an upload title inline."""
+
+	upload_id = id
+
+	if 'email' in session:
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+		print user
+
+		upload = Upload.query.get(id)
+		print upload
+
+		name = request.form.get('name')
+		print request.form
+		print name
+
+		upload.title = name
+		db.session.commit()
+			
+		return redirect('/profile')
+
+	else:
+		flash('You must be logged in to view files')
+		return redirect('/login')
 
 
 @app.route('/collection/<int:id>')
@@ -380,7 +502,8 @@ def collection_page(id):
 		uploads = [cu.upload for cu in this_collection.collectionsuploads]
 
 		# get list of users with permission for viewing collection
-		collectionusers = CollectionsUsers.query.filter_by(collection_id=id).all()
+		collectionusers = CollectionsUsers.query.filter_by(
+			collection_id=id).all()
 		print 'ALLOWED USERS: ', collectionusers
 
 		user_permissions = []
@@ -389,8 +512,10 @@ def collection_page(id):
 
 		print 'list of user id: ', user_permissions
 
-		if (this_collection.user_id == user.id) or (user.id in user_permissions):
-			return render_template('collection.html', user=user, collection=this_collection, uploads=uploads)
+		if (this_collection.user_id == user.id) or (
+			user.id in user_permissions):
+			return render_template('collection.html', user=user,
+				collection=this_collection, uploads=uploads)
 		
 		else:
 			flash('You don\'t have access to view this page')
@@ -412,7 +537,8 @@ def add_to_collection(id):
 		user = User.query.filter_by(email=user_email).first()
 
 		this_collection = request.form['collection']
-		existing_collection = Collection.query.filter_by(title=this_collection, user_id=user.id).first()
+		existing_collection = Collection.query.filter_by(title=this_collection,
+			user_id=user.id).first()
 
 		if existing_collection == None: 
 			new_collection = Collection(title=this_collection, user_id=user.id)
@@ -420,7 +546,8 @@ def add_to_collection(id):
 			db.session.commit()
 			print 'Added new collection to db: ', new_collection
 
-			add_this_upload = CollectionsUploads(collection_id=new_collection.id, upload_id=upload_id)
+			add_this_upload = CollectionsUploads(
+				collection_id=new_collection.id, upload_id=upload_id)
 			db.session.add(add_this_upload)
 			db.session.commit()
 			print 'Added new upload to collection: ', add_this_upload
@@ -431,7 +558,8 @@ def add_to_collection(id):
 		else: # associate this upload to the already existing collection
 			print 'Existing collection id: ', existing_collection.id
 			print 'Upload id: ', upload_id
-			add_this_upload = CollectionsUploads(collection_id=existing_collection.id, upload_id=upload_id)
+			add_this_upload = CollectionsUploads(
+				collection_id=existing_collection.id, upload_id=upload_id)
 			db.session.add(add_this_upload)
 			db.session.commit()
 			print 'Add this upload to existing collection: ', add_this_upload
@@ -460,20 +588,21 @@ def add_upload_to_collection(id):
 		user = User.query.filter_by(email=user_email).first()
 
 		# check if upload is in current collection
-		current_cu = CollectionsUploads.query.filter_by(collection_id=collection.id, upload_id=upload.id).first()
+		current_cu = CollectionsUploads.query.filter_by(
+			collection_id=collection.id, upload_id=upload.id).first()
 
 		# check if upload is associated with other collection
-		other_cu = CollectionsUploads.query.filter_by(upload_id=upload.id).first()
+		other_cu = CollectionsUploads.query.filter_by(
+			upload_id=upload.id).first()
 
 		if other_cu == None:
-			print 'upload is not part of a collection'
-			add_to_collect = CollectionsUploads(collection_id=collection.id, upload_id=upload_id)
+			add_to_collect = CollectionsUploads(collection_id=collection.id,
+				upload_id=upload_id)
 			db.session.add(add_to_collect)
 			db.session.commit()
-			print 'added unattached upload to new collection'
 
 		elif current_cu:
-			print 'do nothing because it is part of collection'
+			print 'Nothing, upload is already part of this collection.'
 			flash('')
 
 		else:
@@ -508,7 +637,8 @@ def share_collection(id):
 			return redirect('/profile')
 
 		else:
-			shared_with_user = CollectionsUsers(collection_id=collection_id, user_id=other.id)
+			shared_with_user = CollectionsUsers(collection_id=collection_id,
+				user_id=other.id)
 			db.session.add(shared_with_user)
 			db.session.commit()
 			print 'Added new user to collection: ', shared_with_user
@@ -568,7 +698,8 @@ def success_message_upload():
 	collection_id = request.args.get('COLLECTION_ID')
 	collection = Collection.query.get(collection_id)
 
-	flash('Upload %s added to collection %s!' % (upload.title, collection.title))
+	flash('Upload %s added to collection %s!' % (
+		upload.title, collection.title))
 	return redirect('/profile')
 
 
@@ -626,6 +757,7 @@ def signup_process():
 	entered_fname = request.form['first_name']
 	entered_lname = request.form['last_name']
 	entered_email = request.form['email']
+	entered_tel = request.form['tel']
 	entered_pw = request.form['password']
 	entered_pw2 = request.form['password2']
 
@@ -639,7 +771,8 @@ def signup_process():
 			
 			else:
 				# update password into database
-				new_user = User(email= entered_email, password = entered_pw, first_name=entered_fname, last_name=entered_lname) 
+				new_user = User(email= entered_email, password = entered_pw,
+					first_name=entered_fname, last_name=entered_lname, tel=entered_tel) 
 				db.session.add(new_user)
 				db.session.commit()
 
