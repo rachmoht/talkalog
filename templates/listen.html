@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     
-    <h2>{{ upload.title }}</h2>
+    <h2 id="upload-title" upload-id="{{ upload.id }}">{{ upload.title }}</h2>
     <div class="file-box">
         <ul class="list-group">
             <li class="list-group-item list-group-heading row">
@@ -22,7 +22,12 @@
                     </audio>
                 </div>
                 <div class="col-sm-3">
-                    {{ upload.transcript }}
+                    {% if upload.transcript %}
+                        {{ upload.transcript }}
+                    {% else %}
+                        <button id="load">Generate Transcript</button></pre>
+                        <div id="transcript-content"> </div>
+                    {% endif %}
                 </div>
                 <div class="col-sm-3">
                     {% if upload.collectionsuploads %}
@@ -41,4 +46,28 @@
             </li>
         </ul>
     </div>
+
+
+
+<script>
+var uploadId = $('#upload-title').attr('upload-id');
+$('#load').click(function () {
+    $('#transcript-content').html('<img id="loader-img" alt="" src="/static/img/loading.gif" width="25" height="25" align="center" />');
+    $(this).hide();
+
+    // Ajax Request
+    $.ajax({
+    type: "GET",
+    dataType: "json",
+    url: "/generate-transcript/" + uploadId,
+    success: function(resp) {
+        // This replace the retrieved data to the div after the setTimeOut function
+        setTimeout(function () {
+                $('#transcript-content').html(resp.transcript).addClass('border');
+            }, 3000);
+        }
+    });
+});
+
+</script>
 {% endblock %}

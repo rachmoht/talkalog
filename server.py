@@ -407,32 +407,6 @@ def listen_audio(id):
 		user = User.query.filter_by(email=user_email).first()
 
 		this_file = Upload.query.filter_by(id=id).first()
-		open_filename = urllib2.urlopen(UPLOAD_FOLDER + '/' + this_file.path)
-		# hardcoded for testing
-		# open_file = urllib2.urlopen('https://s3.amazonaws.com/radhackbright/REc2c050b4431425bad1e81093c9bd2487.wav') 
-		filename = this_file.path
-		filename = filename.replace(".wav", ".flac")
-		print 'Filename as FLAC: ', filename
-		
-		# TODO: Fix FLAC issue
-		if this_file.transcript == None:
-
-			r = sr.Recognizer()
-			with sr.WavFile(open_file) as source:   
-				# extract audio data from the file           
-				audio = r.record(source)                        
-
-			try:
-				# recognize speech using Google Speech Recognition
-				print("Transcription: " + r.recognize(audio))   
-				generated_transcript = r.recognize(audio)
-
-				this_file.transcript = generated_transcript
-				db.session.commit()
-
-			except LookupError:     
-				# speech is unintelligible                            
-				print("Could not understand audio")
 
 		# check if upload belongs to a collection
 		cu = this_file.collectionsuploads
@@ -460,6 +434,36 @@ def listen_audio(id):
 		return redirect('/')
 
 
+@app.route('/generate-transcript/<int:id>')
+def generate_transcript(id):
+	"""Generate transcript if none exists for audio via Twilio calls."""
+
+	this_file = Upload.query.filter_by(id=id).first()
+	open_file = urllib2.urlopen(UPLOAD_FOLDER + '/' + this_file.path)
+	
+	# if this_file.transcript == None:
+	# 	r = sr.Recognizer()
+	# 	with sr.WavFile(open_file) as source:   
+	# 		# extract audio data from the file           
+	# 		audio = r.record(source)                        
+
+	# 	try:
+	# 		# recognize speech using Google Speech Recognition
+	# 		print("Transcription: " + r.recognize(audio))   
+	# 		generated_transcript = r.recognize(audio)
+
+	# 		this_file.transcript = generated_transcript
+	# 		# db.session.commit()
+
+	# 	except LookupError:     
+	# 		# speech is unintelligible                            
+	# 		print("Could not understand audio")
+
+	generated_transcript = 'This is a test! <p>Yay, paragraphs!</p>'
+
+	return jsonify(transcript=generated_transcript)    
+
+
 @app.route('/edit/title/<int:id>', methods=['GET', 'POST'])
 def edit_title(id):
 	"""Edit an upload title inline."""
@@ -472,7 +476,7 @@ def edit_title(id):
 		print user
 
 		upload = Upload.query.get(id)
-		print upload
+		print '***** upload: ', upload
 
 		name = request.form.get('name')
 		print request.form

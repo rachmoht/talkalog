@@ -1,27 +1,35 @@
+@import 'base';
+
 body {
-  background-color: #E6E3DD;
-  color: #565a5c; }
+  background-color: $bg;
+  color: #565a5c;
+}
 
 .navbar-default {
   background-color: #C13561;
   /*background-image: -webkit-linear-gradient(-360deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);
   background-image: linear-gradient(90deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);*/
-  color: #fff; }
+  color: #fff;
+}
 
-.navbar-default a,
-.navbar-default .navbar-brand,
-.navbar-default .navbar-nav > li > a {
-  color: #fff; }
+.navbar-default a, 
+.navbar-default .navbar-brand, 
+.navbar-default .navbar-nav>li>a {
+  color: #fff;
+}
 
 .navbar {
-  margin-bottom: 0; }
+  margin-bottom: 0;
+}
 
 nav.navbar-home.navbar-default {
   background-color: transparent;
-  margin-bottom: 48px; }
+  margin-bottom: 48px;
+}
 
 .alert {
-  margin: 20px auto; }
+  margin: 20px auto;
+}
 
 .jumbotron {
   background-repeat: no-repeat;
@@ -29,26 +37,30 @@ nav.navbar-home.navbar-default {
   background-size: auto 300%;
   background-color: transparent;
   color: white;
-  padding: 0 0 80px; }
+  padding: 0 0 80px;
+}
 
 .jumbotron a.btn.btn-default.btn-lg {
-  background-color: rgba(255, 255, 255, 0.8); }
+  background-color: rgba(255,255,255,0.8);
+}
 
 .footer {
   padding-top: 40px;
   padding-bottom: 40px;
   margin-top: 40px;
-  border-top: 1px solid #eee; }
+  border-top: 1px solid #eee;
+}
 
-#recordingslist audio {
-  display: block;
-  margin-bottom: 10px; }
+#recordingslist audio { 
+  display: block; margin-bottom: 10px; 
+}
 
 #info {
   font-size: 20px;
   text-align: center;
   color: #777;
-  visibility: hidden; }
+  visibility: hidden;
+}
 
 #results {
   font-size: 14px;
@@ -56,37 +68,41 @@ nav.navbar-home.navbar-default {
   border: 1px solid #ddd;
   padding: 15px;
   text-align: left;
-  min-height: 150px; }
-
+  min-height: 150px;
+}
 .list-group-heading {
   background-color: #afa797;
-  color: #fff; }
+  color: #fff;
+}
 
 .draggable {
-  background: url("/static/img/drag-drop.png") no-repeat 10px center/10px auto rgba(255, 255, 255, 0.7);
+  background: url('/static/img/drag-drop.png') no-repeat 10px center / 10px auto rgba(255,255,255,0.7);
   clear: both;
   display: block;
   min-height: 40px;
-  padding-left: 30px; }
+  padding-left: 30px;
+}
 
 .draggable:hover {
-  cursor: -webkit-grab; }
+  cursor: -webkit-grab;
+}
 
 .collection {
   background-color: #efefef !important;
-  padding-left: 30px; }
+  padding-left: 30px;
+}
 
 .click-to-edit {
   font-size: 70%;
   vertical-align: baseline;
   padding: 0 5px;
-  color: #ccc; }
+  color: #ccc;
+}
 
 .click-to-edit:hover {
   font-size: 70%;
   vertical-align: baseline;
   padding: 0 5px;
   color: #565a5c;
-  cursor: pointer; }
-
-/*# sourceMappingURL=style.css.map */
+  cursor: pointer;
+}

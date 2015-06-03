@@ -44,14 +44,13 @@
     </script>
     <script>
         $(function(){
-
-            $('.editable').click(function(e){  
-                var uploadId = $(e).attr('upload-id');
-
+            $('.edit').click(function(e){  
+                var uploadId = $(this).siblings('.upload-title').attr(
+                    'upload-id');
                 console.log('the id to edit: ' + uploadId);
 
                 $('#upload-' + uploadId).editable({
-                    url: '/edit/title/' + $('.upload-title').attr('upload-id'),
+                    url: '/edit/title/' + uploadId,
                     title: 'Edit Title',
                     pk: 1,
                     toggle: 'manual',
@@ -63,12 +62,9 @@
                     }
                 });
 
-
                 e.stopPropagation();
-                console.log($('.upload-title').attr('upload-id'))
-                $('.upload-title').editable('toggle');
+                $('#upload-' +  uploadId).editable('toggle');
             });
-
         });
     </script>
     <script>
@@ -134,8 +130,8 @@
                             <div class="name col-sm-6">
                                 <div class="control-group control-group-inline">
                                     <div class="controls">
-                                        <a href="/listen/{{ cu.upload.id }}" class="upload-title" data-toggle=".pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}" id="upload-{{ cu.upload.id }}">{{ cu.upload.title }}</a> 
-                                        <span class="edit pencil-{{ cu.upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
+                                        <a href="/listen/{{ cu.upload.id }}" class="upload-title" data-toggle="#pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}" id="upload-{{ cu.upload.id }}">{{ cu.upload.title }}</a> 
+                                        <span class="edit" id="pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
                                     </div>
                                 </div>
                             </div>
