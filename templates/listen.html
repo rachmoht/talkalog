@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-    
+<script src="//cdn.ckeditor.com/4.4.7/basic/ckeditor.js"></script>
     <h2 id="upload-title" upload-id="{{ upload.id }}">{{ upload.title }}</h2>
     <div class="file-box">
         <ul class="list-group">
@@ -24,8 +24,9 @@
                 <div class="col-sm-3">
                     {% if upload.transcript %}
                         {{ upload.transcript }}
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Edit Transcript</button>
                     {% else %}
-                        <button id="load">Generate Transcript</button></pre>
+                        <button id="load" class="btn btn-default">Generate Transcript</button>
                         <div id="transcript-content"> </div>
                     {% endif %}
                 </div>
@@ -47,13 +48,40 @@
         </ul>
     </div>
 
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+        </div>
+        <div class="modal-body">
+            <form action="/save-transcript">
+                <textarea name="editor1" id="editor1" rows="10" cols="80" value="Transcript">
+                    {% if upload.transcript %}
+                        {{ upload.transcript }}
+                    {% endif %}
+                </textarea>
+                <button class="btn btn-primary" type="submit">Add Note</button>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            hee
+        </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
-var uploadId = $('#upload-title').attr('upload-id');
 $('#load').click(function () {
     $('#transcript-content').html('<img id="loader-img" alt="" src="/static/img/loading.gif" width="25" height="25" align="center" />');
     $(this).hide();
+
+    var uploadId = $('#upload-title').attr('upload-id');
+    var editTranscript = '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Edit Transcript</button>';
 
     // Ajax Request
     $.ajax({
@@ -61,13 +89,39 @@ $('#load').click(function () {
     dataType: "json",
     url: "/generate-transcript/" + uploadId,
     success: function(resp) {
+        var myTranscript = resp.transcript;
         // This replace the retrieved data to the div after the setTimeOut function
         setTimeout(function () {
-                $('#transcript-content').html(resp.transcript).addClass('border');
+                // display transcript content
+                $('#transcript-content').html(resp.transcript + editTranscript);
+
+                // set editor value to transcript for editing
+                CKEDITOR.instances['editor1'].setData(resp.transcript); 
             }, 3000);
+        
         }
     });
 });
 
 </script>
+<script>
+$.fn.modal.Constructor.prototype.enforceFocus = function() {
+  modal_this = this
+  $(document).on('focusin.modal', function (e) {
+    if (modal_this.$element[0] !== e.target && !modal_this.$element.has(e.target).length 
+    && !$(e.target.parentNode).hasClass('cke_dialog_ui_input_select') 
+    && !$(e.target.parentNode).hasClass('cke_dialog_ui_input_text')) {
+      modal_this.$element.focus()
+    }
+  })
+};
+</script>
+
+<script>
+    // Replace the <textarea id="editor1"> with a CKEditor
+    // instance, using default configuration.
+    CKEDITOR.replace( 'editor1' );
+    var data = CKEDITOR.instances.editor1.getData();
+</script>
+
 {% endblock %}
