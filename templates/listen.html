@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-sm-3">
                     {% if upload.transcript %}
-                        {{ upload.transcript }}
+                        {{ upload.transcript|safe }}
                         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Edit Transcript</button>
                     {% else %}
                         <button id="load" class="btn btn-default">Generate Transcript</button>
@@ -57,7 +57,7 @@
             <h4 class="modal-title" id="myModalLabel">Modal title</h4>
         </div>
         <div class="modal-body">
-            <form action="/save-transcript">
+            <form action="/save-transcript/{{ upload.id }}">
                 <textarea name="editor1" id="editor1" rows="10" cols="80" value="Transcript">
                     {% if upload.transcript %}
                         {{ upload.transcript }}
@@ -122,6 +122,11 @@ $.fn.modal.Constructor.prototype.enforceFocus = function() {
     // instance, using default configuration.
     CKEDITOR.replace( 'editor1' );
     var data = CKEDITOR.instances.editor1.getData();
+</script>
+
+<script>
+    var strHTML = $('#transcript-display').html();
+    Label.Text = Server.HtmlDecode(strHTML);
 </script>
 
 {% endblock %}

@@ -1,54 +1,65 @@
 {% extends 'base.html' %}
 {% block imports %}
-<script src="/static/js/recorder.js"></script>
-<script src="/static/js/recorderFunctions.js"></script>
+    <script src="/static/js/recorder.js"></script>
+    <script src="/static/js/recorderFunctions.js"></script>
 {% endblock %}
+
 {% block content %}
-<h1>Record</h1>
-<button id="start_button">record</button>
-<button id="stop_button">stop</button>
 
-<div id="info">
-</div>
-<div id="results">
-  <span id="final_span" class="final"></span>
-  <span id="interim_span" class="interim"></span>
-  <p>
-</div>
-<div class="center">
-  <div id="div_language">
-    <select id="select_language" onchange="updateCountry()"></select>
-    &nbsp;&nbsp;
-    <select id="select_dialect"></select>
-  </div>
-</div>
+    <div class="row text-center">
+        <h1>Record</h1>
+        <button class="btn btn-default" id="start_button">Record</button>
+        <button class="btn btn-default" id="stop_button">Stop</button>
+    </div>
 
-<h2>Recordings</h2>
-<ul id="recordingslist"></ul>
+    <hr>
 
-<h2>Log</h2>
-<pre id="log"></pre>
+    <div class="row">
+        <div class="col-sm-6">
+            <h6>Transcript <small>This can be edited later</small></h6>
+            <div id="results">
+                <span id="final_span" class="final"></span>
+                <span id="interim_span" class="interim"></span>
+            </div>
 
-<div class="upload-info">
-  <label>Title: 
-    <input type="text" name="title" id="recording-title">
-  </label>
-  <input type="submit" value="submit audio" id="submit-audio">
-</div>
+            <div class="center">
+                <div id="div_language">
+                    <select id="select_language" onchange="updateCountry()"></select>
+                    &nbsp;&nbsp;
+                    <select id="select_dialect"></select>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="upload-info">
+                <h6>Title</h6>
+                <div class="form-group">
+                    <input type="text" name="title" class="form-control" id="recording-title">
+                </div>
+                <input type="submit" value="Submit Audio" id="submit-audio" class="btn btn-default">
+            </div>
+        </div>
+    </div>
 
-<script src="/static/js/webSpeech.js"></script>
+    <div id="recordingslist"></div>
 
-<script>
+    <h2>Log</h2>
+    <pre id="log"></pre>
 
-$('#start_button').click(function() {
-  // startRecording(this);
-  startButton(event);
-});
+    <div id="info"></div>
+{% endblock %}
 
-$('#stop_button').click(function() {
-  stopRecording(this); 
-  startButton(event);
-});
+{% block footerimports %}
+    <script src="/static/js/webSpeech.js"></script>
 
-</script>
+    <script>
+        $('#start_button').click(function() {
+        startButton(event);
+        });
+
+        $('#stop_button').click(function() {
+        stopRecording(this); 
+        startButton(event);
+        });
+    </script>
 {% endblock %}

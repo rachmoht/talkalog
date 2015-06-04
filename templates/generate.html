@@ -2,7 +2,13 @@
 {% block content %}
 
     {% if request_number %}
-      <p>Request sent! This request number: {{ request_number }}</a></p>
+    <h2>Request sent!</h2>
+    <p>Request number: {{ request_number }}</a></p>
+
+
+    {% elif generated_url %}
+    <h2>Request URL Generated!</h2>
+    <p>Share this URL to request recording:<br> <a href="/request/{{ generated_url }}">localhost:5000/request/{{ generated_url }}</a></p>
 
     {% else %}
 
@@ -14,10 +20,6 @@
         </div>
     	<input type="submit" value="Generate a request URL!" class="btn btn-default">
     </form>
-
-    {% if generated_url %}
-      <p>Share this URL to request recording:<br> <a href="/request/{{ generated_url }}">/request/{{ generated_url }}</a></p>
-    {% endif %}
 
     <hr>
 

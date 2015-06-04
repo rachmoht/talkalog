@@ -1,191 +1,151 @@
 {% extends 'base.html' %}
+
 {% block content %}
-    <script>
-        $(function() {
-            var draggable = $( ".draggable" );
-            draggable =  _.isArray(draggable) ?
-                draggable : [draggable];
-            _.each(draggable, function(item){
-                item.draggable({ 
-                    helper: "original",
-                    revert: "invalid",
-                    stack: ".draggable",
+    
+    <h3>Welcome, {{ user.first_name }}</h3>
+    <div class="row">
+        <div class="col-sm-3">
+            <p><a href="/record"><span class="glyphicon glyphicon-record" aria-hidden="true"></span> Record</a></p>
+            <p><a href="/generate"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send Request</a></p>
+            <p><a href="#" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Collection</a></p>
+            <hr>
+            <h6>User Info</h6>
+            <p><small>{{ user.first_name }} {{ user.last_name }}<br>
+                {{ user.email }}<br>
+                {{ user.tel }}</small></p>
+        </div>
+        <div class="col-sm-9">
+            <div class="file-box">
+                <ul class="list-group">
+                    {% if user.collections %}
+                        {% for collection in user.collections %}
+                            <li class="droppable list-group-item collection row" collection-id="{{ collection.id }}">
+                                <div class="name col-xs-8">
+                                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> <a href="/collection/{{ collection.id }}">{{ collection.title }}</a>
+                                </div>
+                                <div class="share col-xs-4 text-right">
+                                    <!-- Button trigger modal -->
+                                    <a href="#" data-toggle="modal" data-target="#share-{{ collection.id }}">
+                                      Share <span class="hidden-xs">Collection</span>
+                                    </a>
 
-                });
-            })
-            
-            var droppable = $( ".droppable");
-            droppable = _.isArray(droppable) ?
-                droppable : [droppable];
-
-            _.each(droppable, function(item){
-                item.droppable({
-                    drop: function (event, ui){
-                        var uploadId = ui.draggable.attr('upload-id');
-                        console.log('Upload ID: ' + uploadId);
-
-                        var collectionId = event.target.attributes['collection-id'].value;
-                        console.log('Collection ID: ' + collectionId);
-
-                        $.ajax({
-                            url: "/add-to-collection/"+uploadId +"",
-                            type: "POST",
-                            data: {
-                                'upload_id': uploadId,
-                                'collection_id': collectionId 
-                            } 
-                        }).done(function(data) {
-                            window.location.href = "/success-collection?UPLOAD_ID="+uploadId+"&COLLECTION_ID="+collectionId;
-                        });
-                    }
-                });
-            })
-        });
-    </script>
-    <script>
-        $(function(){
-            $('.edit').click(function(e){  
-                var uploadId = $(this).siblings('.upload-title').attr(
-                    'upload-id');
-                console.log('the id to edit: ' + uploadId);
-
-                $('#upload-' + uploadId).editable({
-                    url: '/edit/title/' + uploadId,
-                    title: 'Edit Title',
-                    pk: 1,
-                    toggle: 'manual',
-                    params: function(params) {
-                        var data = {};
-                        data['id'] = params.pk;
-                        data['name'] = params.value;
-                        return data;
-                    }
-                });
-
-                e.stopPropagation();
-                $('#upload-' +  uploadId).editable('toggle');
-            });
-        });
-    </script>
-    <script>
-        window.twttr = (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0],
-        t = window.twttr || {};
-        if (d.getElementById(id)) return t;
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "https://platform.twitter.com/widgets.js";
-        fjs.parentNode.insertBefore(js, fjs);
-
-        t._e = [];
-        t.ready = function(f) {
-        t._e.push(f);
-        };
-
-        return t;
-        }(document, "script", "twitter-wjs"));
-    </script>
-
-    <h2>Welcome, {{ user.first_name }}</h2>
-    <p>{{ user.first_name }} {{ user.last_name }} | User ID: {{ user.id }} | {{ user.email }} | {{ user.tel }}</p>
-
-    <hr>
-
-    <div class="file-box">
-        <ul class="list-group">
-            {% if user.collections %}
-                {% for collection in user.collections %}
-                    <li class="droppable list-group-item collection row" collection-id="{{ collection.id }}">
-                        <div class="name col-sm-6"><a href="/collection/{{ collection.id }}">{{ collection.title }}</a></div>
-                        <div class="type col-sm-3">Collection</div>
-                        <div class="share col-sm-3">
-                            <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#share-{{ collection.id }}">
-                              Share
-                            </button>
-
-                            <!-- Modal -->
-                            <div class="modal fade" id="share-{{ collection.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                            <h4 class="modal-title" id="myModalLabel">Share {{ collection.title }}</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="/share/{{ collection.id }}" method="POST">
-                                                <label>Enter email for sharing: 
-                                                    <input type="text" name="email">
-                                                </label>
-                                                <input type="submit" value="Share Collection">
-                                            </form>
+                                    <!-- Modal -->
+                                    <div class="modal fade text-left" id="share-{{ collection.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title" id="myModalLabel">Share {{ collection.title }}</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="/share/{{ collection.id }}" method="POST">
+                                                        <div class="form-group">
+                                                            <label for="email">Enter email for sharing:</label>
+                                                            <input type="text" name="email" class="form-control">
+                                                        </div>
+                                                        <input type="submit" value="Share Collection" class="btn btn-default">
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <small>* Email must belong to a Talkalog user</small>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </li>
-                    {% for cu in collection.collectionsuploads %}
-                        <li class="draggable upload list-group-item row" upload-id="{{ cu.upload.id }}">
-                            <div class="name col-sm-6">
-                                <div class="control-group control-group-inline">
-                                    <div class="controls">
-                                        <a href="/listen/{{ cu.upload.id }}" class="upload-title" data-toggle="#pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}" id="upload-{{ cu.upload.id }}">{{ cu.upload.title }}</a> 
-                                        <span class="edit" id="pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
+                            </li>
+                            {% for cu in collection.collectionsuploads %}
+                                <li class="draggable upload list-group-item row" upload-id="{{ cu.upload.id }}">
+                                    <div class="name col-xs-8">
+                                        <div class="control-group control-group-inline">
+                                            <div class="controls">
+                                                <a href="/listen/{{ cu.upload.id }}" class="upload-title" data-toggle="#pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}" id="upload-{{ cu.upload.id }}">{{ cu.upload.title }}</a> 
+                                                <span class="edit" id="pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="type col-xs-4 text-right">
+                                        <small>{{ cu.upload.datetime }}</small>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+
+            {% if singleuploads %}
+
+            <h5>Unattached Files</h5>
+            <div class="file-box">
+                <ul class="list-group"> 
+                    {% for upload in singleuploads %}
+                        {% if upload.path %}
+                            <li class="draggable upload list-group-item row" upload-id="{{ upload.id }}">
+                                <div class="name col-xs-8">
+                                    <div class="control-group control-group-inline">
+                                        <div class="controls">
+                                            <a href="/listen/{{ upload.id }}" class="upload-title" data-toggle=".pencil-{{ upload.id }}" upload-id="{{ upload.id }}" id="upload-{{ upload.id }}">{{ upload.title }}</a> 
+                                            <span class="edit pencil-{{ upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="type col-sm-3">Audio File</div>
-                            <div class="share col-sm-3">
-                                Share
-                            </div>
+
+                                <div class="type col-xs-4 text-right">
+                                    <small>{{ upload.datetime }}</small>
+                                </div>
+                            </li> 
+                        {% endif %}         
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if user.collectionsusers %}
+            <h5>Collections Shared With Me</h5>
+            <div class="file-box">
+                <ul class="list-group">
+                    {% for collection in user.collectionsusers %}
+                        <li class="list-group-item collection row">
+                            <div class="name col-sm-6"><a href="/collection/{{ collection.collection.id }}">{{ collection.collection.title }}</a></div>
+                            <div class="col-sm-6">Shared by: {{ collection.collection.user.first_name }} {{ collection.collection.user.last_name }}</div>
                         </li>
                     {% endfor %}
-                {% endfor %}
+                </ul>
+            </div>
             {% endif %}
-        </ul>
+        </div><!-- col 9 -->
     </div>
 
-    {% if singleuploads %}
 
-    <h5>Unattached Uploads</h5>
-    <div class="file-box">
-        <ul class="list-group"> 
-            {% for upload in singleuploads %}
-                {% if upload.path %}
-                    <li class="draggable upload list-group-item row" upload-id="{{ upload.id }}">
-                        <div class="name col-sm-6">
-                            <div class="control-group control-group-inline">
-                                <div class="controls">
-                                    <a href="/listen/{{ upload.id }}" class="upload-title" data-toggle=".pencil-{{ upload.id }}" upload-id="{{ upload.id }}" id="upload-{{ upload.id }}">{{ upload.title }}</a> 
-                                    <span class="edit pencil-{{ upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
-                                </div>
-                            </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add a New Collection</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="/add-new-collection" method="POST">
+                        <div class="form-group">
+                            <label for="title">Collection Title:</label>
+                            <input type="text" class="form-control" name="title">
                         </div>
-
-                        <div class="type col-sm-3">Audio File</div>
-                        <div class="share col-sm-3">
-                            Share
-                        </div>
-                    </li> 
-                {% endif %}         
-            {% endfor %}
-        </ul>
+                        <input type="submit" value="Submit" class="btn btn-default">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <small>* Collections must have unique titles</small>
+                </div>
+            </div>
+        </div>
     </div>
-    {% endif %}
+{% endblock %}
 
-    {% if user.collectionsusers %}
-    <h5>Collections Shared With Me</h5>
-    <div class="file-box">
-        <ul class="list-group">
-            {% for collection in user.collectionsusers %}
-                <li class="list-group-item collection row">
-                    <div class="name col-sm-6"><a href="/collection/{{ collection.collection.id }}">{{ collection.collection.title }}</a></div>
-                    <div class="col-sm-6">Shared by: {{ collection.collection.user.first_name }} {{ collection.collection.user.last_name }}</div>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
 
+{% block imports %}
+<script src="/static/js/draggable-droppable.js"></script>
+<script src="/static/js/xeditable.js"></script>
 {% endblock %}

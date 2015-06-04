@@ -5,46 +5,69 @@
 {% endblock %}
 
 {% block content %}
-<h2>Request #<span id="request-id">{{ requested_obj.id }}</span> for {{ requested_obj.upload.title }}</h2>
-<ul>
-  <li>User that made request: {{ requested_obj.user_id }}</li>
-  <li>Upload ID associated: {{ requested_obj.upload_id }}</li>
-</ul>
 
-<h1>Record</h1>
-<button onclick="startRecording(this); startButton(event);" id="start_button">record</button>
-<button onclick="stopRecording(this); startButton(event);" disabled>stop</button>
+    <div class="row">
+        <h1 class="text-center">Record</h1>
+        <h5 class="text-center">Request #<span id="request-id">{{ requested_obj.id }}</span> for {{ requested_obj.upload.title }}</h5>
+        <div class="col-sm-8">
+            <p>{{ requested_obj.user.first_name }} {{ requested_obj.user.last_name }} is requesting a recording for <em>{{ requested_obj.upload.title }}</em>. Hit "record" when you are ready. Press "stop" when you are finished recording.</p>
+        </div>
+        <div class="col-sm-4 text-center">
+            <button class="btn btn-default btn-lg" id="start_button">Record</button>
+            <button class="btn btn-default btn-lg" id="stop_button">Stop</button>
+        </div>
+    </div>
 
-<div id="info">
-</div>
+    <hr>
 
-<div id="results">
-  <span id="final_span" class="final"></span>
-  <span id="interim_span" class="interim"></span>
-  <p>
-</div>
+    <div class="row">
+        <div class="col-sm-6">
+            <h6>Transcript <small>This can be edited by the user once submitted</small></h6>
+            <div id="results">
+                <span id="final_span" class="final"></span>
+                <span id="interim_span" class="interim"></span>
+            </div>
 
-<div class="center">
-  <div id="div_language">
-    <select id="select_language" onchange="updateCountry()"></select>
-    &nbsp;&nbsp;
-    <select id="select_dialect"></select>
-  </div>
-</div>
+            <div class="center">
+                <div id="div_language">
+                    <select id="select_language" onchange="updateCountry()"></select>
+                    &nbsp;&nbsp;
+                    <select id="select_dialect"></select>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="upload-info">
+                <h6>Update Title</h6>
+                <div class="form-group">
+                    <input type="text" name="recording-title" class="form-control" id="recording-title">
+                </div>
+                <input type="submit" value="Submit Audio" id="submit-audio" class="btn btn-default">
+            </div>
+        </div>
+    </div>
 
-<h2>Recordings</h2>
-<ul id="recordingslist"></ul>
+    <div id="recordingslist"></div>
 
-<h2>Log</h2>
-<pre id="log"></pre>
+    <div class="hidden">
+        <h2>Log</h2>
+        <pre id="log"></pre>
 
-<div class="upload-info">
-  <label>Update Title: 
-    <input type="text" name="recording-title" id="recording-title">
-  </label>
-  <input type="submit" value="submit audio" id="submit-audio">
-</div>
+        <div id="info"></div>
+    </div>
+{% endblock %}
 
-<script src="/static/js/webSpeech.js"></script>
+{% block footerimports %}
+    <script src="/static/js/webSpeech.js"></script>
 
+    <script>
+        $('#start_button').click(function() {
+        startButton(event);
+        });
+
+        $('#stop_button').click(function() {
+        stopRecording(this); 
+        startButton(event);
+        });
+    </script>
 {% endblock %}

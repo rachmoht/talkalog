@@ -33,7 +33,7 @@ function stopRecording(button) {
 function createDownloadLink() {
   recorder && recorder.exportWAV(function(blob) {
     var url = URL.createObjectURL(blob);
-    var li = document.createElement('li');
+    var span = document.createElement('span');
     var au = document.createElement('audio');
     var hf = document.createElement('a');
     
@@ -42,9 +42,9 @@ function createDownloadLink() {
     hf.href = url;
     hf.download = new Date().toUTCString() + '.wav';
     hf.innerHTML = hf.download;
-    li.appendChild(au);
-    li.appendChild(hf);
-    recordingslist.appendChild(li);
+    span.appendChild(au);
+    // li.appendChild(hf);
+    recordingslist.appendChild(span);
 
     var form = new FormData();
     var reqID = $( '#request-id' ).html();    
@@ -56,8 +56,6 @@ function createDownloadLink() {
       
       form.append('title', $('#recording-title').val());
       form.append('transcript', myTranscript);
-      alert(myTranscript);
-      alert('Submitting!');
       $.ajax({
         type: 'POST',
         url: '/request/' + reqID,

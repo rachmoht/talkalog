@@ -1,114 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  	<title>Project</title>
-    
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/style.css"/>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+		<title>Project</title>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/static/css/style.css"/>
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-  </head>
-  <body>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 
-    <div class="jumbotron">
-	    <nav class="navbar-home navbar-default">
-	      <div class="container-fluid">
-	        <!-- Brand and toggle get grouped for better mobile display -->
-	        <div class="navbar-header">
-	          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-	            <span class="sr-only">Toggle navigation</span>
-	            <span class="icon-bar"></span>
-	            <span class="icon-bar"></span>
-	            <span class="icon-bar"></span>
-	          </button>
-	          <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-road" aria-hidden="true"></span> Project</a>
-	        </div>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	</head>
+  	<body id="home">
+		<div class="jumbotron">
+			<nav class="navbar-home navbar-default">
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="/"><span class="glyphicon glyphicon-road" aria-hidden="true"></span> Talkalog</a>
+					</div>
 
-
-	        <!-- Collect the nav links, forms, and other content for toggling -->
-	        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-	          <ul class="nav navbar-nav navbar-right">
-	            {% if 'email' in session %}
-	              <li class="dropdown">
-	                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ session['email'] }} <span class="caret"></span></a>
-	                <ul class="dropdown-menu" role="menu">
-	                  <li><a href="/"><span class="glyphicon glyphicon-headphones" aria-hidden="true"></span> Profile</a></li>
-	                  <li><a href="/record"><span class="glyphicon glyphicon-record" aria-hidden="true"></span> Record</a></li>
-	                  <li><a href="/generate"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send Request</a></li>
-	                  <li class="divider"></li>
-	                  <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a></li>
-	                </ul>
-	              </li>
-	            {% else %}
-	              <li><a href="/login">Login</a></li>
-	              <li><a href="/signup">Sign Up</a></li>
-	            {% endif %}
-	          </ul>
-	        </div><!-- /.navbar-collapse -->
-	      </div><!-- /.container-fluid -->
-	    </nav>
-		<div class="container text-center">
-			<h1>Project</h1>
-			<h6>Destination memos and audio blogging on-the-go.</h6>
-
-			<p><a class="btn btn-default btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+						<ul class="nav navbar-nav navbar-right">
+						{% if 'email' in session %}
+							<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ session['email'] }} <span class="caret"></span></a>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="/"><span class="glyphicon glyphicon-headphones" aria-hidden="true"></span> Profile</a></li>
+								<li><a href="/record"><span class="glyphicon glyphicon-record" aria-hidden="true"></span> Record</a></li>
+								<li><a href="/generate"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send Request</a></li>
+								<li class="divider"></li>
+								<li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a></li>
+							</ul>
+							</li>
+						{% else %}
+							<li><a href="/login">Login</a></li>
+							<li><a href="/signup">Sign Up</a></li>
+						{% endif %}
+						</ul>
+					</div><!-- /.navbar-collapse -->
+				</div><!-- /.container-fluid -->
+			</nav>
+			<div class="container text-center">
+				<h1>Talkalog</h1>
+				<h6>Destination memos and audio blogging on-the-go.</h6>
+			</div>
 		</div>
-    </div>
 
-    {% with messages = get_flashed_messages() %}
-      {% for message in messages %}
-        <div class="container">
-          <div class="alert alert-warning">{{ message }}</div>
-        </div>
-      {% endfor %}
-    {% endwith %}
+		{% block content %}
+		<div class="container-fluid content">
+			{% with messages = get_flashed_messages() %}
+				{% for message in messages %}
+				<div class="alert alert-warning">{{ message }}</div>
+				{% endfor %}
+			{% endwith %}
 
-	{% block content %}
-    <div class="container-fluid">
-
-		<!-- Example row of columns -->
-		<div class="row">
-			<div class="col-sm-4">
-				<h4>Audio Heirlooms</h4>
-				<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+			<div class="row featurette">
+				<div class="col-md-5">
+					<h2 class="featurette-heading">The easiest way to tell a story.</h2>
+					<p class="lead">As simple as a phone call and easier than writing by hand. Preserve your oral history with Talkalog: memories on-the-go.</p>
+				</div>
+				<div class="col-md-2">
+					<img src="/static/img/tel.png" alt="Telephone Cloud Services">
+				</div>
+				<div class="col-md-5">
+					<form action="/login-process" method="POST">
+						<div class="form-group">
+							<label for="email">Email:</label>
+							<input type="email" class="form-control" name="email" placeholder="name@domain.com">
+						</div>
+						<div class="form-group">
+							<label for="password">Password:</label>
+							<input type="password" class="form-control" name="password">
+						</div>
+						<input type="submit" value="Log In" class="btn btn-default">
+					</form>
+				</div>
 			</div>
-			<div class="col-sm-4">
-				<h4>On the Web, Over the Phone</h4>
-				<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-			</div>
-			<div class="col-sm-4">
-				<h4>Log In</h4>
-				<form action="/login-process" method="POST">
-					<div class="form-group">
-						<label for="email">Email:</label>
-						<input type="email" class="form-control" name="email" placeholder="name@domain.com">
-					</div>
-					<div class="form-group">
-						<label for="password">Password:</label>
-						<input type="password" class="form-control" name="password">
-					</div>
-					<input type="submit" value="Log In" class="btn btn-default">
-				</form>
-			</div>
-		</div><!-- row -->
-    </div><!-- /container -->
-    {% endblock %}
 
-    <div class="container-fluid">
-      <footer class="footer">
-        <p>© Company 2014</p>
-      </footer>
-    </div>
-    <script src="/static/js/style.js"></script>
-  </body>
+			<hr class="featurette-divider">
+
+			<div class="row">
+				<div class="col-sm-6">
+					<h4>Audio Heirlooms</h4>
+					<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+				</div>
+				<div class="col-sm-6">
+					<h4>On the Web, Over the Phone</h4>
+					<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+				</div>
+			</div><!-- row -->
+		</div><!-- /container -->
+		{% endblock %}
+
+		<div class="container-fluid">
+			<footer class="footer">
+				<p>Storytelling is the most powerful way to put ideas into the world today.</p>
+			</footer>
+		</div>
+        <script src="/static/js/style.js"></script>
+	</body>
 </html>

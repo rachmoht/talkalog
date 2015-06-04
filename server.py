@@ -396,6 +396,36 @@ def handle_requested_recording():
 	client.recordings.delete(recording_sid)
 
 	return str(resp)
+			
+
+@app.route('/request/<string:id>', methods=['GET', 'POST'])
+def requested_audio_page(id):
+	"""Record audio via request URL. Capture audio blob and save to S3, transcript, and title."""
+
+	requested_obj = RequestID.query.get(id)
+	assoc_upload = Upload.query.get(requested_obj.upload_id)
+
+	if request.method == 'POST':
+		file = request.files['file']
+		title = request.form.get('title')
+		transcript = request.form.get('transcript')
+
+		if file:
+			filename = str_generator(30) + '.wav'
+			assoc_upload.title = title
+			assoc_upload.path = filename
+			assoc_upload.transcript = transcript
+			db.session.commit()
+			print 'Committed new recording %s' % filename
+
+			# save audio file to S3 bucket
+			k = b.new_key(filename)
+			k.set_contents_from_file(file)
+
+		return render_template("thanks.html")
+
+	else:
+		return render_template("request_page.html", requested_obj=requested_obj)
 
 
 @app.route('/listen/<int:id>')
@@ -422,7 +452,7 @@ def listen_audio(id):
 				collect_users.append(i.user_id)
 
 		if (this_file.user_id == user.id) or (user.id in collect_users):
-			return render_template('listen.html', user=user, upload=this_file,
+			return render_template('listen2.html', user=user, upload=this_file,
 				upload_folder=UPLOAD_FOLDER)
 
 		else:
@@ -462,6 +492,20 @@ def generate_transcript(id):
 	generated_transcript = 'This is a test! <p>Yay, paragraphs!</p>'
 
 	return jsonify(transcript=generated_transcript)    
+
+
+@app.route('/save-transcript/<int:id>')
+def save_edited_transcript(id):
+	edited = request.args.get('editor1')
+	print 'ID of edited: ', edited
+
+	upload = Upload.query.get(id)
+	print 'upload: ', upload
+
+	upload.transcript = edited
+	db.session.commit()
+
+	return redirect('/listen/' + str(id))
 
 
 @app.route('/edit/title/<int:id>', methods=['GET', 'POST'])
@@ -530,51 +574,29 @@ def collection_page(id):
 		return redirect('/')
 
 
-@app.route('/add/<int:id>', methods=['GET', 'POST'])
-def add_to_collection(id):
-	"""Add an existing upload to a collection."""
+@app.route('/add-new-collection', methods=['GET', 'POST'])
+def add_new_collection():
+	"""Add a new collection unattached from an upload."""
+	
+	user_email = session['email']
+	user = User.query.filter_by(email=user_email).first()
 
-	upload_id = id
+	new_title = request.form['title']
+	existing_collection = Collection.query.filter_by(title=new_title,
+		user_id=user.id).first()
 
-	if 'email' in session:
-		user_email = session['email']
-		user = User.query.filter_by(email=user_email).first()
+	if existing_collection == None: 
+		new_collection = Collection(title=new_title, user_id=user.id)
+		db.session.add(new_collection)
+		db.session.commit()
 
-		this_collection = request.form['collection']
-		existing_collection = Collection.query.filter_by(title=this_collection,
-			user_id=user.id).first()
-
-		if existing_collection == None: 
-			new_collection = Collection(title=this_collection, user_id=user.id)
-			db.session.add(new_collection)
-			db.session.commit()
-			print 'Added new collection to db: ', new_collection
-
-			add_this_upload = CollectionsUploads(
-				collection_id=new_collection.id, upload_id=upload_id)
-			db.session.add(add_this_upload)
-			db.session.commit()
-			print 'Added new upload to collection: ', add_this_upload
-
-			flash('Successfully added to collection')
-			return redirect('/profile')
-
-		else: # associate this upload to the already existing collection
-			print 'Existing collection id: ', existing_collection.id
-			print 'Upload id: ', upload_id
-			add_this_upload = CollectionsUploads(
-				collection_id=existing_collection.id, upload_id=upload_id)
-			db.session.add(add_this_upload)
-			db.session.commit()
-			print 'Add this upload to existing collection: ', add_this_upload
-			
-			flash('Successfully added to collection')
-
-			return redirect('/profile')
+		flash('Successfully added new collection: %s' % new_collection.title)
+		return redirect('/profile')
 
 	else:
-		flash('You must be logged in to view files')
-		return redirect('/login')
+		flash('Collection with this title already exists')
+		return redirect('/profile')
+
 
 
 @app.route('/add-to-collection/<int:id>', methods=['GET', 'POST'])
@@ -612,14 +634,12 @@ def add_upload_to_collection(id):
 		else:
 			other_cu.collection_id = collection.id
 			db.session.commit()
-			print 'switched collections'
 
 		return redirect('/profile')
 
 	else:
 		flash('You must be logged in to view files')
 		return redirect('/login')
-
 
 
 @app.route('/share/<int:id>', methods=['GET', 'POST'])
@@ -649,39 +669,6 @@ def share_collection(id):
 
 			flash('Shared with %s' % other.email)
 			return redirect('/profile')
-			
-
-@app.route('/request/<string:id>', methods=['GET', 'POST'])
-def requested_audio_page(id):
-	"""Show more information about the single user logged in."""
-
-	requested_obj = Request.query.get(id)
-	assoc_upload = Upload.query.get(requested_obj.upload_id)
-
-	if request.method == 'POST':
-		file = request.files['file']
-		print 'FILE: ', file
-
-		title = request.form.get('title')
-		print 'TITLE: ', title
-
-		transcript = request.form.get('transcript')
-		print 'TRANSCRIPT: ', transcript
-
-		if file and is_allowed_file(file.filename):
-			filename = secure_filename(file.filename)
-			assoc_upload.title = title
-			assoc_upload.path = filename
-			assoc_upload.transcript = transcript
-
-			print 'NEW assoc upload: ', assoc_upload
-
-			db.session.commit()
-			print 'Committed new recording %s' % filename
-
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-	return render_template("request_page.html", requested_obj=requested_obj)
 
 
 @app.route('/success')

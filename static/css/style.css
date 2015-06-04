@@ -1,45 +1,87 @@
+@import url(http://fonts.googleapis.com/css?family=Merriweather:300italic,300,700,700italic);
 body {
-  background-color: #E6E3DD;
-  color: #565a5c; }
+  color: #565a5c;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center center;
+  height: 100%;
+  width: 100%; }
+
+a {
+  color: #607c7a;
+  -webkit-transition: color 0.1s linear 0s;
+  -moz-transition: color 0.1s linear 0s;
+  -o-transition: color 0.1s linear 0s;
+  transition: color 0.1s linear 0s; }
+  a:hover {
+    color: #f18e7b;
+    text-decoration: none; }
+
+.h1, .h2, .h3, .h4, .h5,
+h1, h2, h3, h4, h5 {
+  font-weight: 200; }
+
+.lead {
+  font-family: "Merriweather", serif; }
+
+.featurette-divider {
+  margin: 80px 0; }
 
 .navbar-default {
-  background-color: #C13561;
-  /*background-image: -webkit-linear-gradient(-360deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);
-  background-image: linear-gradient(90deg, #813561 40%, #B83264 60%, #D83B5A 80%, #E44E38 100%);*/
-  color: #fff; }
+  background-color: #E6E3DD; }
 
 .navbar-default a,
 .navbar-default .navbar-brand,
 .navbar-default .navbar-nav > li > a {
-  color: #fff; }
-
-.navbar {
-  margin-bottom: 0; }
+  color: #565a5c; }
+  .navbar-default a:hover,
+  .navbar-default .navbar-brand:hover,
+  .navbar-default .navbar-nav > li > a:hover {
+    color: #cccccc; }
 
 nav.navbar-home.navbar-default {
   background-color: transparent;
   margin-bottom: 48px; }
+  nav.navbar-home.navbar-default a {
+    color: #ffffff; }
 
 .alert {
   margin: 20px auto; }
 
-.jumbotron {
-  background-repeat: no-repeat;
+#home {
+  background-size: cover;
+  background-attachment: fixed;
   background-position: center center;
-  background-size: auto 300%;
-  background-color: transparent;
-  color: white;
-  padding: 0 0 80px; }
+  height: 100%;
+  width: 100%; }
+  #home .jumbotron {
+    color: #ffffff;
+    background-color: transparent;
+    padding: 0 0 80px; }
+    #home .jumbotron a.btn.btn-default.btn-lg {
+      background-color: rgba(255, 255, 255, 0.8); }
+  #home .footer {
+    color: #ffffff; }
 
-.jumbotron a.btn.btn-default.btn-lg {
-  background-color: rgba(255, 255, 255, 0.8); }
+.content {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding-top: 40px;
+  padding-bottom: 80px; }
+
+.container.content {
+  padding: 20px 40px 80px;
+  border-radius: 3px; }
 
 .footer {
   padding-top: 40px;
   padding-bottom: 40px;
   margin-top: 40px;
-  border-top: 1px solid #eee; }
+  text-align: center;
+  font-style: italic;
+  font-family: "Merriweather", serif;
+  color: #cccccc; }
 
+/* profile */
 #recordingslist audio {
   display: block;
   margin-bottom: 10px; }
@@ -68,25 +110,40 @@ nav.navbar-home.navbar-default {
   display: block;
   min-height: 40px;
   padding-left: 30px; }
-
-.draggable:hover {
-  cursor: -webkit-grab; }
+  .draggable:hover {
+    cursor: -webkit-grab; }
 
 .collection {
-  background-color: #efefef !important;
-  padding-left: 30px; }
+  background-color: #E6E3DD !important;
+  padding-left: 0;
+  font-weight: 600; }
+  .collection a {
+    color: #4d5d5b; }
+
+.glyphicon-folder-open {
+  color: #565a5c;
+  padding-right: 10px; }
 
 .click-to-edit {
   font-size: 70%;
   vertical-align: baseline;
   padding: 0 5px;
   color: #ccc; }
+  .click-to-edit:hover {
+    font-size: 70%;
+    vertical-align: baseline;
+    padding: 0 5px;
+    color: #565a5c;
+    cursor: pointer; }
 
-.click-to-edit:hover {
-  font-size: 70%;
-  vertical-align: baseline;
-  padding: 0 5px;
-  color: #565a5c;
-  cursor: pointer; }
+/* audio and listen */
+audio {
+  display: block;
+  margin: 20px auto; }
+
+.btn-update {
+  float: right;
+  margin: 10px auto 20px;
+  clear: both; }
 
 /*# sourceMappingURL=style.css.map */
