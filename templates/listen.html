@@ -19,7 +19,8 @@
     <div class="transcript-body lead">
     {% if upload.transcript %}
         {{ upload.transcript|safe }}
-        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Edit Transcript</button>
+
+        <button type="button" class="btn btn-default edit-transcript" data-toggle="modal" data-target="#myModal">Edit Transcript</button>
     {% else %}
         <button id="load" class="btn btn-default">Generate Transcript</button>
         <div id="transcript-content"> </div>

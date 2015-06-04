@@ -157,12 +157,12 @@ nav.navbar-home.navbar-default {
     font-size: 70%;
     vertical-align: baseline;
     padding: 0 5px;
-    color: #ccc;
+    color: $greylt;
     &:hover {
         font-size: 70%;
         vertical-align: baseline;
         padding: 0 5px;
-        color: #565a5c;
+        color: $grey;
         cursor: pointer;
         }
     }
@@ -181,4 +181,10 @@ audio {
     float: right;
     margin: 10px auto 20px;
     clear: both;
-}
+    }
+
+.edit-transcript {
+    clear: both;
+    display: block;
+    margin: 20px 0 0;
+    }

@@ -128,7 +128,7 @@ nav.navbar-home.navbar-default {
   font-size: 70%;
   vertical-align: baseline;
   padding: 0 5px;
-  color: #ccc; }
+  color: #cccccc; }
   .click-to-edit:hover {
     font-size: 70%;
     vertical-align: baseline;
@@ -148,5 +148,10 @@ audio {
   float: right;
   margin: 10px auto 20px;
   clear: both; }
+
+.edit-transcript {
+  clear: both;
+  display: block;
+  margin: 20px 0 0; }
 
 /*# sourceMappingURL=style.css.map */
