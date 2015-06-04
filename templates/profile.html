@@ -107,8 +107,8 @@
                 <ul class="list-group">
                     {% for collection in user.collectionsusers %}
                         <li class="list-group-item collection row">
-                            <div class="name col-sm-6"><a href="/collection/{{ collection.collection.id }}">{{ collection.collection.title }}</a></div>
-                            <div class="col-sm-6">Shared by: {{ collection.collection.user.first_name }} {{ collection.collection.user.last_name }}</div>
+                            <div class="name col-xs-8"><a href="/collection/{{ collection.collection.id }}">{{ collection.collection.title }}</a></div>
+                            <div class="col-xs-4 text-right"><small class="hidden-xs">Shared by:</small> {{ collection.collection.user.first_name }} {{ collection.collection.user.last_name }}</div>
                         </li>
                     {% endfor %}
                 </ul>

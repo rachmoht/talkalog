@@ -1,15 +1,8 @@
 @import 'base';
 
 body {
-    // background-color: $white;
+    background-color: $white;
     color: $grey;
-
-
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center center;
-    height: 100%;
-    width: 100%;
     }
 
 a {
@@ -38,7 +31,8 @@ h1, h2, h3, h4, h5 {
     }
 
 .navbar-default {
-    background-color: $beige;
+    border-radius: 0;
+    border: none;
     }
 
 .navbar-default a, 
@@ -175,12 +169,6 @@ audio {
 
 #cke_editor1 {
     margin-bottom: 10px;
-    }
-
-.btn-update {
-    float: right;
-    margin: 10px auto 20px;
-    clear: both;
     }
 
 .edit-transcript {

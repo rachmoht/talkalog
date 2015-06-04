@@ -1,11 +1,7 @@
 @import url(http://fonts.googleapis.com/css?family=Merriweather:300italic,300,700,700italic);
 body {
-  color: #565a5c;
-  background-size: cover;
-  background-attachment: fixed;
-  background-position: center center;
-  height: 100%;
-  width: 100%; }
+  background-color: #ffffff;
+  color: #565a5c; }
 
 a {
   color: #607c7a;
@@ -28,7 +24,8 @@ h1, h2, h3, h4, h5 {
   margin: 80px 0; }
 
 .navbar-default {
-  background-color: #E6E3DD; }
+  border-radius: 0;
+  border: none; }
 
 .navbar-default a,
 .navbar-default .navbar-brand,
@@ -143,11 +140,6 @@ audio {
 
 #cke_editor1 {
   margin-bottom: 10px; }
-
-.btn-update {
-  float: right;
-  margin: 10px auto 20px;
-  clear: both; }
 
 .edit-transcript {
   clear: both;
