@@ -1,24 +1,24 @@
 {% extends 'home.html' %}
 {% block content %}
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-6">
-        <h5>Site News Lorem Ipsum</h5>
-        <p>Welcome back, lorem ipsum.</p>
-      </div>
-      <div class="col-sm-6">
-        <form action="/login-process" method="POST">
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" class="form-control" name="email" placeholder="name@domain.com">
-          </div>
-          <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" class="form-control" name="password">
-          </div>
-          <input type="submit" value="Log In" class="btn btn-default">
-        </form>
-      </div>
+    <div class="container content">
+        <div class="row featurette">
+            <div class="col-sm-6">
+                <h2 class="featurette-heading">The easiest way to tell a story.</h2>
+                <p class="lead">As simple as a phone call and easier than writing by hand. Preserve your oral history with Talkalog: memories on-the-go.</p>
+            </div>
+            <div class="col-sm-6">
+                <form action="/login-process" method="POST">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" class="form-control" name="email" placeholder="name@domain.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+                    <input type="submit" value="Log In" class="btn btn-default">
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 {% endblock %}

@@ -452,7 +452,7 @@ def listen_audio(id):
 				collect_users.append(i.user_id)
 
 		if (this_file.user_id == user.id) or (user.id in collect_users):
-			return render_template('listen2.html', user=user, upload=this_file,
+			return render_template('listen.html', user=user, upload=this_file,
 				upload_folder=UPLOAD_FOLDER)
 
 		else:

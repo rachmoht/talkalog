@@ -1,80 +1,68 @@
 {% extends 'base.html' %}
-{% block content %}
+
+{% block imports %}
 <script src="//cdn.ckeditor.com/4.4.7/basic/ckeditor.js"></script>
-    <h2 id="upload-title" upload-id="{{ upload.id }}">{{ upload.title }}</h2>
-    <div class="file-box">
-        <ul class="list-group">
-            <li class="list-group-item list-group-heading row">
-                <div class="name col-sm-6">
-                    <h6>Play</h6>
-                </div>
-                <div class="type col-sm-3">
-                    <h6>Transcript</h6>
-                </div>
-                <div class="share col-sm-3">
-                    <h6>Collection</h6>
-                </div>
-            </li>
-            <li class="list-group-item row">
-                <div class="col-sm-6">
-                    <audio controls>
-                        <source src="{{ upload_folder }}/{{ upload.path }}" type="audio/wav">
-                    </audio>
-                </div>
-                <div class="col-sm-3">
-                    {% if upload.transcript %}
-                        {{ upload.transcript|safe }}
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Edit Transcript</button>
-                    {% else %}
-                        <button id="load" class="btn btn-default">Generate Transcript</button>
-                        <div id="transcript-content"> </div>
-                    {% endif %}
-                </div>
-                <div class="col-sm-3">
-                    {% if upload.collectionsuploads %}
-                        {% for uc in upload.collectionsuploads %}
-                            <a href="/collection/{{ uc.collection.id }}">{{ uc.collection.title }}</a>
-                        {% endfor %}
-                    {% else %}
-                        <form action="/add/{{ upload.id }}" method="POST">
-                            <label>Collection: 
-                                <input type="text" name="collection">
-                            </label>
-                            <input type="submit" value="Save Collection">
-                        </form>
-                    {% endif %}
-                </div>
-            </li>
-        </ul>
+{% endblock %}
+
+{% block content %}
+
+    <h1 id="upload-title" upload-id="{{ upload.id }}" class="text-center">{{ upload.title }}</h1>
+
+    <audio controls>
+        <source src="{{ upload_folder }}/{{ upload.path }}" type="audio/wav">
+    </audio>
+
+    <hr>
+
+    <h6>The Transcript</h6>
+
+    <div class="transcript-body lead">
+    {% if upload.transcript %}
+        {{ upload.transcript|safe }}
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Edit Transcript</button>
+    {% else %}
+        <button id="load" class="btn btn-default">Generate Transcript</button>
+        <div id="transcript-content"> </div>
+    {% endif %}
     </div>
 
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-        </div>
-        <div class="modal-body">
-            <form action="/save-transcript/{{ upload.id }}">
-                <textarea name="editor1" id="editor1" rows="10" cols="80" value="Transcript">
-                    {% if upload.transcript %}
-                        {{ upload.transcript }}
-                    {% endif %}
-                </textarea>
-                <button class="btn btn-primary" type="submit">Add Note</button>
-            </form>
-        </div>
 
-        <div class="modal-footer">
-            hee
+    <hr>
+
+    <p><small>Published on {{ upload.datetime }}<br>
+    {% if upload.collectionsuploads %}
+        Collection: 
+        {% for uc in upload.collectionsuploads %}
+            <a href="/collection/{{ uc.collection.id }}">{{ uc.collection.title }}</a>
+        {% endfor %}
+    {% endif %}
+    </small></p>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Edit Transcript</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="/save-transcript/{{ upload.id }}">
+                        <textarea name="editor1" id="editor1" rows="10" cols="80" value="Transcript">
+                            {% if upload.transcript %}
+                                {{ upload.transcript }}
+                            {% endif %}
+                        </textarea>
+                        <button class="btn btn-default" type="submit">Update Transcript</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-  </div>
-</div>
+{% endblock %}
 
 
+{% block footerimports %}
 <script>
 $('#load').click(function () {
     $('#transcript-content').html('<img id="loader-img" alt="" src="/static/img/loading.gif" width="25" height="25" align="center" />');
@@ -122,11 +110,6 @@ $.fn.modal.Constructor.prototype.enforceFocus = function() {
     // instance, using default configuration.
     CKEDITOR.replace( 'editor1' );
     var data = CKEDITOR.instances.editor1.getData();
+    CKEDITOR.instances['editor1'].setData(resp.transcript); 
 </script>
-
-<script>
-    var strHTML = $('#transcript-display').html();
-    Label.Text = Server.HtmlDecode(strHTML);
-</script>
-
 {% endblock %}

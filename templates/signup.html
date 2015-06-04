@@ -1,34 +1,42 @@
 {% extends 'home.html' %}
 {% block content %}
-  <div class="container content">
-    <h2>Sign Up</h2>
-    <hr>
-    <form action="/signup-process" method="POST">
-      <div class="form-group">
-        <label for="first_name">First Name:</label>
-        <input type="text" name="first_name" placeholder="First name" class="form-control">
-      </div>
-      <div class="form-group">
-        <label for="last_name">Last Name:</label>
-        <input type="text" name="last_name" placeholder="Last name" class="form-control">
-      </div>
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="text" name="email" placeholder="name@domain.com" class="form-control">
-      </div>
-      <div class="form-group">
-          <label for="tel">Phone Number:</label>
-          <input type="tel" name="tel" class="form-control" placeholder="5555555555" min="10" max="10" required>
-      </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="text" name="password" class="form-control">
-      </div>
-      <div class="form-group">
-        <label for="password2">Confirm Password:</label>
-        <input type="text" name="password2" class="form-control">
-      </div>
-      <input type="submit" value="Sign Up" class="btn btn-default">
-    </form>
-  </div>
+    <div class="container-fluid content">
+        <div class="row featurette">
+            <div class="col-sm-6">
+                <h2 class="featurette-heading">The easiest way to tell a story.</h2>
+                <p class="lead">As simple as a phone call and easier than writing by hand. Preserve your oral history with Talkalog: memories on-the-go.</p>
+            </div>
+            <div class="col-sm-6">
+                <h2>Sign Up</h2>
+                <hr>
+                <form action="/signup-process" method="POST">
+                    <div class="form-group">
+                        <label for="first_name">First Name:</label>
+                        <input type="text" name="first_name" placeholder="First name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name:</label>
+                        <input type="text" name="last_name" placeholder="Last name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="text" name="email" placeholder="name@domain.com" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="tel">Phone Number:</label>
+                        <input type="tel" name="tel" class="form-control" placeholder="5555555555" min="10" max="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="text" name="password" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">Confirm Password:</label>
+                        <input type="text" name="password2" class="form-control">
+                    </div>
+                    <input type="submit" value="Sign Up" class="btn btn-default">
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
