@@ -83,13 +83,6 @@ def is_allowed_file(filename):
 		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-	"""Serve up files from the /uploads folder."""
-
-	return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
 @app.route('/')
 def index():
 	"""Home."""
@@ -104,7 +97,7 @@ def index():
 
 @app.route('/profile')
 def user_page():
-	"""Show more information about the single user logged in."""
+	"""User profile with list of audio collections and files."""
 
 	if 'email' in session:
 		user_email = session['email']
@@ -126,7 +119,7 @@ def user_page():
 			if i.id not in user_cu:
 				singleuploads.append(i)
 
-		return render_template("profile.html", user=user,
+		return render_template('profile.html', user=user,
 			singleuploads=singleuploads, upload_folder=UPLOAD_FOLDER)
 
 	else:
@@ -136,7 +129,7 @@ def user_page():
 
 @app.route('/record', methods=['GET', 'POST'])
 def record_audio():
-	"""Record audio. Capture data and be able to callback."""
+	"""Record audio from user and capture data, including title and blob."""
 
 	if 'email' in session: 
 		user_email = session['email']
@@ -167,7 +160,7 @@ def record_audio():
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate_request_str():
-	"""Generate random, unique string for private user associated URLs."""
+	"""Generate requests with unique URL or Twilio text prompt."""
 
 	# initialize generated_url
 	generated_url = False
@@ -202,14 +195,12 @@ def generate_request_str():
 					(user.first_name, twilio_number, request_str),
 
 				to='+1' + tel_number, # number to send request
-				from_="+14153196892") # Twilio number
+				from_='+14153196892') # Twilio number
 
 				request_number = request_str
 
 			else: 
 				request_str = request_generator()
-				print 'Generated request string', request_str
-			
 				title = request.form.get('title')
 
 				new_upload_placeholder = Upload(user_id=user.id, title=title)
@@ -230,29 +221,26 @@ def generate_request_str():
 		flash('You must be logged in to generate request URL!')
 		return redirect('/login')
 
-	return render_template("generate.html", generated_url=generated_url,
+	return render_template('generate.html', generated_url=generated_url,
 		request_number=request_number)
 
 
-@app.route("/incoming", methods=['GET', 'POST'])
+@app.route('/incoming', methods=['GET', 'POST'])
 def incoming_call():
 	"""Respond to incoming requests via Twilio call."""
 	
 	from_number = request.values.get('From', None)
-	print 'Number: ', from_number
-	call_sid = request.values.get("CallSid", None)
+	call_sid = request.values.get('CallSid', None)
 
 	# check if this is a user number
 	from_number = from_number.replace('+1', '')
-	print from_number
 	user = User.query.filter_by(tel=from_number).first()
-	print user
 
 	resp = twilio.twiml.Response()
 
 	if user != None:
 		# greet the caller
-		resp.say("Hello, %s." % user.first_name)
+		resp.say('Hello, %s.' % user.first_name)
 
 		resp.say("""Start recording your story after the tone. 
 			After you are finished recording, press any key to confirm.""")
@@ -274,9 +262,9 @@ def incoming_call():
 		(request_str),
 
 		to='+1' + user.tel, # number to send request
-		from_="+14153196892") # Twilio number
+		from_='+14153196892') # Twilio number
 
-		resp.record(action="/handle-user-recording")
+		resp.record(action='/handle-user-recording')
 		return str(resp)
 
 	else: 
@@ -466,11 +454,12 @@ def listen_audio(id):
 
 @app.route('/generate-transcript/<int:id>')
 def generate_transcript(id):
-	"""Generate transcript if none exists for audio via Twilio calls."""
+	"""Generate transcript if none exists from audio files using Google Speech Recognition."""
 
 	this_file = Upload.query.filter_by(id=id).first()
 	open_file = urllib2.urlopen(UPLOAD_FOLDER + '/' + this_file.path)
 	
+	# TODO: currently commented out for quicker demo purposes
 	# if this_file.transcript == None:
 	# 	r = sr.Recognizer()
 	# 	with sr.WavFile(open_file) as source:   
@@ -489,18 +478,18 @@ def generate_transcript(id):
 	# 		# speech is unintelligible                            
 	# 		print("Could not understand audio")
 
-	generated_transcript = '<p>Ideas for Friend Date App, take one.</p><p>Use Facebook to connect friends nearby and cross reference with event websites.</p>'
+	# hardcoded for demo purposes
+	generated_transcript = 'Ideas for Friend Date App, take one Use Facebook to connect friends nearby and cross reference with event websites'
 
 	return jsonify(transcript=generated_transcript)    
 
 
 @app.route('/save-transcript/<int:id>')
 def save_edited_transcript(id):
+	"""Save edited transcript on submit from text editor."""
 	edited = request.args.get('editor1')
-	print 'ID of edited: ', edited
 
 	upload = Upload.query.get(id)
-	print 'upload: ', upload
 
 	upload.transcript = edited
 	db.session.commit()
@@ -510,26 +499,21 @@ def save_edited_transcript(id):
 
 @app.route('/edit/title/<int:id>', methods=['GET', 'POST'])
 def edit_title(id):
-	"""Edit an upload title inline."""
+	"""Edit an upload title inline using X-Editable/Ajax."""
 
 	upload_id = id
 
 	if 'email' in session:
 		user_email = session['email']
 		user = User.query.filter_by(email=user_email).first()
-		print user
-
 		upload = Upload.query.get(id)
-		print '***** upload: ', upload
 
 		name = request.form.get('name')
-		print request.form
-		print name
 
 		upload.title = name
 		db.session.commit()
 			
-		return redirect('/profile')
+		return 'Updated %s in db' % upload
 
 	else:
 		flash('You must be logged in to view files')
@@ -538,7 +522,7 @@ def edit_title(id):
 
 @app.route('/collection/<int:id>')
 def collection_page(id):
-	"""Show more information about a collection."""
+	"""Show uploads and more information associated with a collection."""
 
 	if 'email' in session:
 		user_email = session['email']
@@ -552,13 +536,10 @@ def collection_page(id):
 		# get list of users with permission for viewing collection
 		collectionusers = CollectionsUsers.query.filter_by(
 			collection_id=id).all()
-		print 'ALLOWED USERS: ', collectionusers
 
 		user_permissions = []
 		for u in collectionusers:
 			user_permissions.append(u.user_id)
-
-		print 'list of user id: ', user_permissions
 
 		if (this_collection.user_id == user.id) or (
 			user.id in user_permissions):
@@ -576,7 +557,7 @@ def collection_page(id):
 
 @app.route('/add-new-collection', methods=['GET', 'POST'])
 def add_new_collection():
-	"""Add a new collection unattached from an upload."""
+	"""Add a new collection to user from profile."""
 	
 	user_email = session['email']
 	user = User.query.filter_by(email=user_email).first()
@@ -628,8 +609,7 @@ def add_upload_to_collection(id):
 			db.session.commit()
 
 		elif current_cu:
-			print 'Nothing, upload is already part of this collection.'
-			flash('')
+			return 'Upload is already part of this collection.'
 
 		else:
 			other_cu.collection_id = collection.id
@@ -654,7 +634,6 @@ def share_collection(id):
 
 		other_user_email = request.form['email']
 		other = User.query.filter_by(email=other_user_email).first()
-		print 'Other user to share with: ', other
 
 		if other == None: # if no user exists
 			flash('No user currently exists with this email.')
@@ -665,7 +644,6 @@ def share_collection(id):
 				user_id=other.id)
 			db.session.add(shared_with_user)
 			db.session.commit()
-			print 'Added new user to collection: ', shared_with_user
 
 			flash('Shared with %s' % other.email)
 			return redirect('/profile')
@@ -681,7 +659,7 @@ def success_message_record():
 
 @app.route('/success-collection')
 def success_message_upload():
-	"""Flash a success message and redirect to user profile at submit."""
+	"""On success at /add-to-collection flash and redirect to user profile."""
 
 	upload_id = request.args.get('UPLOAD_ID')
 	upload = Upload.query.get(upload_id)
@@ -696,7 +674,7 @@ def success_message_upload():
 
 @app.route('/thanks')
 def thanks_message_request():
-	"""Flash a success message and redirect to thank you page with info."""
+	"""Flash a thank you message and redirect to thank you page with info."""
 
 	flash('Recording successfully submitted!')
 	return render_template('thanks.html')
@@ -706,7 +684,7 @@ def thanks_message_request():
 def login_user():
 	"""Login page for user."""
 
-	return render_template("login.html")
+	return render_template('login.html')
 
 
 @app.route('/login-process', methods=['POST'])
@@ -721,16 +699,15 @@ def login_process():
 	if user != None:
 		if entered_pw == user.password:
 			session['email'] = request.form['email']
-			print 'Session: ', session
 			flash('You successfully logged in as %s!' % session['email'])
 			return redirect("/profile")
 
 		else:
-			flash("That is not the correct password!")
+			flash('Incorrect password. Please try again.')
 			return redirect('/login')
 
 	else:
-		flash("No existing account for %s" % entered_email)
+		flash('No existing account for %s' % entered_email)
 		return redirect('/signup')
 
 
@@ -738,7 +715,7 @@ def login_process():
 def signup_user():
 	"""Sign up page for new users."""
 
-	return render_template("signup.html")
+	return render_template('signup.html')
 
 
 @app.route('/signup-process', methods=['POST'])
@@ -754,11 +731,11 @@ def signup_process():
 
 	user = User.query.filter_by(email=entered_email).first()
 
-	if request.method == "POST":
+	if request.method == 'POST':
 		if user == None: 
 			if entered_pw != entered_pw2:  
-				flash("Your passwords did not match")
-				return redirect("/signup")
+				flash('Your passwords did not match')
+				return redirect('/signup')
 			
 			else:
 				# update password into database
@@ -768,27 +745,26 @@ def signup_process():
 				db.session.commit()
 
 				session['email'] = entered_email
-				flash("You are signed up %s!" % entered_email) 
-				return redirect("/")
+				flash('You are signed up %s!' % entered_email) 
+				return redirect('/')
 
 		else: 
-			flash("You have already signed up with that email")
+			flash('You have already signed up with that email')
 			return redirect('/login')
 
 
-@app.route("/logout")
+@app.route('/logout')
 def process_logout():
 	"""Route to process logout for users."""
 
 	session.pop('email')
 
-	flash("You have successfully logged out.")
-	return redirect("/")
+	flash('You have successfully logged out.')
+	return redirect('/')
 
 
-if __name__ == "__main__":
-    # We have to set debug=True here, since it has to be True at the point
-    # that we invoke the DebugToolbarExtension
+if __name__ == '__main__':
+    # Set debug=True to utilize the Flask DebugToolbarExtension
     app.debug = False
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
