@@ -1,36 +1,74 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h6>Collection</h6>
-    <h2>{{ collection.title }}</h2>
-    {% if uploads %}
-    <div class="file-box">
-        <ul class="list-group">
-            <li class="list-group-item list-group-heading row">
-                <div class="name col-sm-6">
-                    <h6>Title</h6>
-                </div>
-                <div class="col-sm-3">
-                    <h6>Transcript</h6>
-                </div>
-                <div class="col-sm-3">
-                    <h6>Owner</h6>
-                </div>
-            </li>
-            {% for upload in uploads %}
-                <li class="list-group-item row">
-                    <div class="col-sm-6">
-                        <a href="/listen/{{ upload.id }}">{{ upload.title }}</a>
-                    </div>
-                    <div class="col-sm-3">
-                        {{ upload.transcript }}
-                    </div>
-                    <div class="col-sm-3">
-                        {{ upload.user.first_name }}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+    <h2><small>Collection</small><br>{{ collection.title }}</h2>
+    <div class="row">
+        <div class="col-sm-3">
+            <p><a href="/record"><span class="glyphicon glyphicon-record" aria-hidden="true"></span> Record</a></p>
+            <p><a href="/generate"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send Request</a></p>
+            <p><a href="#" data-toggle="modal" data-target="#share-{{ collection.id }}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Share This Collection</a></p>
+            <hr>
+            <h6>User Info <a href="/edit/user"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></a></h6>
+            <p><small>{{ user.first_name }} {{ user.last_name }}<br>
+                {{ user.email }}<br>
+                {{ user.tel }}</small></p>
+        </div>
+        {% if uploads %}
+        <div class="col-sm-9">
+            <div class="file-box">
+                <ul class="list-group">
+                    <li class="list-group-item list-group-heading row">
+                        <div class="name col-sm-6">
+                            <h6>Audio Title</h6>
+                        </div>
+                        <div class="col-sm-3">
+                        </div>
+                        <div class="col-sm-3">
+                            <h6>Owner</h6>
+                        </div>
+                    </li>
+                {% for upload in uploads %}
+                    <li class="list-group-item upload row">
+                        <div class="col-sm-6">
+                            <a href="/listen/{{ upload.id }}">{{ upload.title }}</a>
+                        </div>
+                        <div class="col-sm-3">
+                        </div>
+                        <div class="col-sm-3">
+                            {{ upload.user.first_name }}
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
+    {% else %}
+    <p>No uploads currently part of this collection!</p>
     {% endif %}
 
+
+
+    <!-- Modal -->
+    <div class="modal fade text-left" id="share-{{ collection.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Share {{ collection.title }}</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="/share/{{ collection.id }}" method="POST">
+                        <div class="form-group">
+                            <label for="email">Enter email for sharing:</label>
+                            <input type="text" name="email" class="form-control">
+                        </div>
+                        <input type="submit" value="Share Collection" class="button">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <small>* Email must belong to a Talkalog user</small>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

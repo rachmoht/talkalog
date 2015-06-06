@@ -17,11 +17,72 @@ a {
 h1, h2, h3, h4, h5 {
   font-weight: 200; }
 
+h1.jumbotext {
+  font-size: 84px;
+  font-weight: 100;
+  color: #E6E3DD; }
+
+h2 small {
+  color: #cccccc;
+  font-size: 45%;
+  text-transform: uppercase;
+  letter-spacing: 2px; }
+
 .lead {
   font-family: "Merriweather", serif; }
 
 .featurette-divider {
   margin: 80px 0; }
+
+.button {
+  background: #6186aa;
+  color: #fff;
+  box-shadow: 0 6px #405972;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 10px 15px;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  outline: none;
+  position: relative;
+  border-radius: 3px;
+  -webkit-transition: none;
+  -moz-transition: none;
+  transition: none; }
+  .button:after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s; }
+  .button:hover {
+    background: #6186aa;
+    box-shadow: 0 4px #405972;
+    top: 2px;
+    color: #ffffff; }
+  .button:focus {
+    background: #6186aa;
+    box-shadow: 0 4px #405972;
+    top: 2px;
+    color: #ffffff; }
+  .button:active {
+    background: #6186aa;
+    box-shadow: 0 0 #405972;
+    top: 6px;
+    color: #ffffff; }
+
+.button.disabled, .button[disabled], fieldset[disabled] .button {
+  pointer-events: none;
+  cursor: not-allowed;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  opacity: .65; }
 
 .navbar-default {
   border-radius: 0;
@@ -45,20 +106,9 @@ nav.navbar-home.navbar-default {
 .alert {
   margin: 20px auto; }
 
-#home {
-  background-size: cover;
-  background-attachment: fixed;
-  background-position: center center;
-  height: 100%;
-  width: 100%; }
-  #home .jumbotron {
-    color: #ffffff;
-    background-color: transparent;
-    padding: 0 0 80px; }
-    #home .jumbotron a.btn.btn-default.btn-lg {
-      background-color: rgba(255, 255, 255, 0.8); }
-  #home .footer {
-    color: #ffffff; }
+.row {
+  margin-left: auto;
+  margin-right: auto; }
 
 .content {
   background-color: rgba(255, 255, 255, 0.9);
@@ -74,9 +124,25 @@ nav.navbar-home.navbar-default {
   padding-bottom: 40px;
   margin-top: 40px;
   text-align: center;
-  font-style: italic;
-  font-family: "Merriweather", serif;
   color: #cccccc; }
+  .footer p {
+    font-style: italic;
+    font-family: "Merriweather", serif; }
+
+#home {
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center center;
+  height: 100%;
+  width: 100%; }
+  #home .jumbotron {
+    color: #ffffff;
+    background-color: transparent;
+    padding: 0 0 80px; }
+    #home .jumbotron a.btn.btn-default.btn-lg {
+      background-color: rgba(255, 255, 255, 0.8); }
+  #home .footer {
+    color: #ffffff; }
 
 /* profile */
 #recordingslist audio {
@@ -97,9 +163,10 @@ nav.navbar-home.navbar-default {
   text-align: left;
   min-height: 150px; }
 
-.list-group-heading {
-  background-color: #afa797;
-  color: #fff; }
+.list-group-item {
+  border-radius: 0 !important;
+  border: none;
+  border-bottom: 1px solid #efefef; }
 
 .draggable {
   background: url("/static/img/drag-drop.png") no-repeat 10px center/10px auto rgba(255, 255, 255, 0.7);
@@ -110,14 +177,42 @@ nav.navbar-home.navbar-default {
   .draggable:hover {
     cursor: -webkit-grab; }
 
-.collection {
-  background-color: #E6E3DD !important;
+.collection, .list-group-heading {
+  background-color: #F4F3F1 !important;
   padding-left: 0;
   font-weight: 600; }
-  .collection a {
+  .collection a, .list-group-heading a {
     color: #4d5d5b; }
 
-.glyphicon-folder-open {
+.panel-heading {
+  border-radius: 0; }
+
+.panel-body {
+  padding: 0; }
+
+.panel-default > .panel-heading + .panel-collapse > .panel-body {
+  border: none; }
+
+.list-group-item:first-child, .list-group-item:last-child {
+  margin-bottom: 0;
+  border-radius: 0; }
+
+.panel-title {
+  margin-top: inherit;
+  margin-bottom: inherit;
+  font-size: inherit;
+  color: inherit; }
+
+.panel-group .panel {
+  margin-bottom: 0;
+  border-radius: 0;
+  border: none; }
+
+.panel-default > .panel-heading {
+  color: inherit;
+  background-color: inherit; }
+
+.glyphicon-folder-open, .glyphicon-folder-close {
   color: #565a5c;
   padding-right: 10px; }
 
@@ -132,6 +227,9 @@ nav.navbar-home.navbar-default {
     padding: 0 5px;
     color: #565a5c;
     cursor: pointer; }
+
+#start_button, #stop_button {
+  cursor: pointer; }
 
 /* audio and listen */
 audio {

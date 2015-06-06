@@ -142,8 +142,12 @@ def record_audio():
 
 			if file:
 				filename = str_generator(30) + '.wav'
-				new_recording = Upload(user_id=user.id, title=title,
-					path=filename, transcript=transcript)
+				if title == '':
+					new_recording = Upload(user_id=user.id,
+						path=filename, transcript=transcript)
+				else:
+					new_recording = Upload(user_id=user.id, title=title,
+						path=filename, transcript=transcript)
 				db.session.add(new_recording)
 				db.session.commit()
 
@@ -649,6 +653,51 @@ def share_collection(id):
 			return redirect('/profile')
 
 
+@app.route('/edit/user', methods=['GET', 'POST'])
+def edit_user_info():
+	"""Allow users to edit info."""
+	if 'email' in session:
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+
+		if request.method == 'POST':
+			entered_fname = request.form['first_name']
+			entered_lname = request.form['last_name']
+			entered_email = request.form['email']
+			entered_tel = request.form['tel']
+			entered_pw = request.form['password']
+			entered_pw2 = request.form['password2']
+
+			if entered_pw != entered_pw2:  
+				flash('Your passwords did not match')
+				return redirect('/edit/user')
+			
+			else:
+				# update password into database
+				if entered_fname:
+					user.first_name = entered_fname
+				if entered_lname:
+					user.last_name = entered_lname
+				if entered_email:
+					user.email = entered_email
+				if entered_tel:
+					user.tel = entered_tel
+				if entered_pw:
+					user.password = entered_pw
+
+				db.session.commit()
+
+				session['email'] = entered_email
+				flash('User info successfully updated!') 
+				return redirect('/')
+
+		return render_template('edit_profile.html', user=user)
+
+	else:
+		flash('You must be logged in to edit your profile')
+		return redirect('/login')
+
+
 @app.route('/success')
 def success_message_record():
 	"""Flash a success message and redirect to user profile at submit."""
@@ -761,6 +810,13 @@ def process_logout():
 
 	flash('You have successfully logged out.')
 	return redirect('/')
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+	"""Custom error handler: 404, page not found."""
+
+	return render_template('404.html'), 404
 
 
 if __name__ == '__main__':

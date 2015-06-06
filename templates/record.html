@@ -8,8 +8,16 @@
 
     <div class="row text-center">
         <h1>Record</h1>
-        <button class="btn btn-default" id="start_button">Record</button>
-        <button class="btn btn-default" id="stop_button">Stop</button>
+
+        <div id="start_button"><img src="/static/img/record.png" alt="Record" width="100" height="100"></div>
+        <div id="stop_button" style="display: none;"><img src="/static/img/stop.png" alt="Stop" width="100" height="100"></div>
+
+        <div id="record-status" style="display: none;">
+            <small>Recording...</small><br>
+            <img src="/static/img/recording.gif" alt="Recording in Progress">
+        </div>
+
+        <div id="recordingslist"></div>
     </div>
 
     <hr>
@@ -22,7 +30,7 @@
                 <span id="interim_span" class="interim"></span>
             </div>
 
-            <div class="center">
+            <div class="hidden">
                 <div id="div_language">
                     <select id="select_language" onchange="updateCountry()"></select>
                     &nbsp;&nbsp;
@@ -34,32 +42,21 @@
             <div class="upload-info">
                 <h6>Title</h6>
                 <div class="form-group">
-                    <input type="text" name="title" class="form-control" id="recording-title">
+                    <input type="text" name="title" class="form-control" id="recording-title" placeholder="">
                 </div>
-                <input type="submit" value="Submit Audio" id="submit-audio" class="btn btn-default">
+                <input type="submit" value="Submit Audio" id="submit-audio" class="button">
             </div>
         </div>
     </div>
 
-    <div id="recordingslist"></div>
+    <div class="hidden">
+        <h2>Log</h2>
+        <pre id="log"></pre>
 
-    <h2>Log</h2>
-    <pre id="log"></pre>
-
-    <div id="info"></div>
+        <div id="info"></div>
+    </div>
 {% endblock %}
 
 {% block footerimports %}
     <script src="/static/js/webSpeech.js"></script>
-
-    <script>
-        $('#start_button').click(function() {
-        startButton(event);
-        });
-
-        $('#stop_button').click(function() {
-        stopRecording(this); 
-        startButton(event);
-        });
-    </script>
 {% endblock %}

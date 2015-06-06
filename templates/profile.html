@@ -9,67 +9,74 @@
             <p><a href="/generate"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Send Request</a></p>
             <p><a href="#" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Collection</a></p>
             <hr>
-            <h6>User Info</h6>
+            <h6>User Info <a href="/edit/user"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></a></h6>
             <p><small>{{ user.first_name }} {{ user.last_name }}<br>
                 {{ user.email }}<br>
                 {{ user.tel }}</small></p>
         </div>
         <div class="col-sm-9">
             <div class="file-box">
-                <ul class="list-group">
+                <ul class="list-group panel-group" id="accordion">
                     {% if user.collections %}
-                        {% for collection in user.collections %}
-                            <li class="droppable list-group-item collection row" collection-id="{{ collection.id }}">
-                                <div class="name col-xs-8">
-                                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> <a href="/collection/{{ collection.id }}">{{ collection.title }}</a>
-                                </div>
-                                <div class="share col-xs-4 text-right">
-                                    <!-- Button trigger modal -->
-                                    <a href="#" data-toggle="modal" data-target="#share-{{ collection.id }}">
-                                      Share <span class="hidden-xs">Collection</span>
-                                    </a>
+                        <div class="panel panel-default">
+                            {% for collection in user.collections %}
+                                <li class="droppable list-group-item collection row panel-heading" collection-id="{{ collection.id }}">
+                                    <div class="name col-xs-8 panel-title">
+                                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ collection.id }}"><span class="indicator glyphicon glyphicon-folder-open" aria-hidden="true"></span></a>
+                                        <a href="/collection/{{ collection.id }}">{{ collection.title }}</a>
+                                    </div>
+                                    <div class="share col-xs-4 text-right">
+                                        <!-- Button trigger modal -->
+                                        <a href="#" data-toggle="modal" data-target="#share-{{ collection.id }}">
+                                          Share <span class="hidden-xs">Collection</span>
+                                        </a>
 
-                                    <!-- Modal -->
-                                    <div class="modal fade text-left" id="share-{{ collection.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                    <h4 class="modal-title" id="myModalLabel">Share {{ collection.title }}</h4>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form action="/share/{{ collection.id }}" method="POST">
-                                                        <div class="form-group">
-                                                            <label for="email">Enter email for sharing:</label>
-                                                            <input type="text" name="email" class="form-control">
-                                                        </div>
-                                                        <input type="submit" value="Share Collection" class="btn btn-default">
-                                                    </form>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <small>* Email must belong to a Talkalog user</small>
+                                        <!-- Modal -->
+                                        <div class="modal fade text-left" id="share-{{ collection.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title" id="myModalLabel">Share {{ collection.title }}</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="/share/{{ collection.id }}" method="POST">
+                                                            <div class="form-group">
+                                                                <label for="email">Enter email for sharing:</label>
+                                                                <input type="text" name="email" class="form-control">
+                                                            </div>
+                                                            <input type="submit" value="Share Collection" class="button">
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <small>* Email must belong to a Talkalog user</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </li>
-                            {% for cu in collection.collectionsuploads %}
-                                <li class="draggable upload list-group-item row" upload-id="{{ cu.upload.id }}">
-                                    <div class="name col-xs-8">
-                                        <div class="control-group control-group-inline">
-                                            <div class="controls">
-                                                <a href="/listen/{{ cu.upload.id }}" class="upload-title" data-toggle="#pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}" id="upload-{{ cu.upload.id }}">{{ cu.upload.title }}</a> 
-                                                <span class="edit" id="pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="type col-xs-4 text-right">
-                                        <small>{{ cu.upload.datetime }}</small>
                                     </div>
                                 </li>
+                                <div class="panel-collapse collapse in" id="collapse{{ collection.id }}">
+                                    <div class="panel-body">
+                                    {% for cu in collection.collectionsuploads %}
+                                        <li class="draggable upload list-group-item row" upload-id="{{ cu.upload.id }}">
+                                            <div class="name col-xs-8">
+                                                <div class="control-group control-group-inline">
+                                                    <div class="controls">
+                                                        <a href="/listen/{{ cu.upload.id }}" class="upload-title" data-toggle="#pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}" id="upload-{{ cu.upload.id }}">{{ cu.upload.title }}</a> 
+                                                        <span class="edit" id="pencil-{{ cu.upload.id }}" upload-id="{{ cu.upload.id }}"><span class="glyphicon glyphicon-pencil click-to-edit" aria-hidden="true"></span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="type col-xs-4 text-right">
+                                                <small>{{ cu.upload.datetime }}</small>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                    </div>
+                                </div>
                             {% endfor %}
-                        {% endfor %}
+                        </div>
                     {% endif %}
                 </ul>
             </div>
@@ -133,7 +140,7 @@
                             <label for="title">Collection Title:</label>
                             <input type="text" class="form-control" name="title">
                         </div>
-                        <input type="submit" value="Submit" class="btn btn-default">
+                        <input type="submit" value="Submit" class="button">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -148,4 +155,7 @@
 {% block imports %}
 <script src="/static/js/draggable-droppable.js"></script>
 <script src="/static/js/xeditable.js"></script>
+{% endblock %}
+{% block footerimports %}
+<script src="/static/js/toggle.js"></script>
 {% endblock %}

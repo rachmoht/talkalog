@@ -20,9 +20,9 @@
     {% if upload.transcript %}
         {{ upload.transcript|safe }}
 
-        <button type="button" class="btn btn-default edit-transcript" data-toggle="modal" data-target="#myModal">Edit Transcript</button>
+        <button type="button" class="button edit-transcript" data-toggle="modal" data-target="#myModal">Edit Transcript</button>
     {% else %}
-        <button id="load" class="btn btn-default">Generate Transcript</button>
+        <button id="load" class="button">Generate Transcript</button>
         <div id="transcript-content"> </div>
     {% endif %}
     </div>
@@ -54,7 +54,7 @@
                                 {{ upload.transcript }}
                             {% endif %}
                         </textarea>
-                        <button class="btn btn-default" type="submit">Update Transcript</button>
+                        <button class="button" type="submit">Update Transcript</button>
                     </form>
                 </div>
             </div>
@@ -70,7 +70,7 @@ $('#load').click(function () {
     $(this).hide();
 
     var uploadId = $('#upload-title').attr('upload-id');
-    var editTranscript = '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Edit Transcript</button>';
+    var editTranscript = '<button type="button" class="button edit-transcript" data-toggle="modal" data-target="#myModal">Edit Transcript</button>';
 
     // Ajax Request
     $.ajax({

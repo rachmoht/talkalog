@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+	<h1 class="jumbotext text-center">404</h1>
+	<p class="text-center"><em>Page Not Found!<br>You will now be redirected...</em></p>
+{% endblock %}
+
+{% block footerimports %}
+<script>
+setTimeout(function(){
+  window.location.replace('/');
+}, 3000);
+</script>
+{% endblock %}

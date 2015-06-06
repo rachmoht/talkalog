@@ -242,3 +242,28 @@ email_button.style.display = style;
 copy_info.style.display = 'none';
 email_info.style.display = 'none';
 }
+
+// Button Functionality
+
+$('#stop_button').hide();
+$('#record-status').hide();
+$('#submit-audio').prop('disabled',true);
+
+$('#start_button').click(function() {
+  $('#start_button').hide();
+  $('#stop_button').show();
+  $('#record-status').show();
+  startButton(event);
+});
+
+// $('#start_button').click(function() {
+// startButton(event);
+// });
+
+$('#stop_button').click(function() {
+  $('#stop_button').hide();
+  $('#record-status').hide();
+$ ('#submit-audio').prop('disabled',false);
+  stopRecording(this); 
+  startButton(event);
+});
