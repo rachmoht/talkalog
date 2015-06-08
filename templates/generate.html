@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
     {% if request_number %}
     <h2>Request sent!</h2>
     <p>Request number: {{ request_number }}</a></p>
@@ -11,31 +12,42 @@
     <p>Share this URL to request recording:<br> <a href="/request/{{ generated_url }}">localhost:5000/request/{{ generated_url }}</a></p>
 
     {% else %}
+    <h1>Create a Story Request</h1>
 
-    <h2>Generate Request URL</h2>
-    <form action="/generate" method="POST">
-        <div class="form-group">
-        	<label for="title">Title:</label>
-        	<input type="text" name="title" class="form-control" placeholder="Audio Title" required>
-        </div>
-    	<input type="submit" value="Generate a request URL!" class="button">
-    </form>
+    <h5>Choose your preferred way to send a request to the storyteller:</h5>
 
     <hr>
 
-    <h2>Generate Request Call</h2>
-    <form action="/generate" method="POST">
-        <div class="form-group">
-            <label for="title">Title:</label>
-            <input type="text" name="title" class="form-control" placeholder="Audio Title" required>
+    <div class="row">
+        <div class="col-sm-6">
+            <h3>Generate a Request URL</h3>
+            <p>Copy and paste the link once generated to your preferred storyteller. When they arrive at the request page, they will be prompted to start recording.</p>
+            <form action="/generate" method="POST">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" name="title" class="form-control" placeholder="Audio Title" required>
+                </div>
+                <input type="submit" value="Generate a request URL!" class="button">
+            </form>
         </div>
+        <div class="col-sm-6">
+                <h3>Generate Request Call</h3>
+                <p>The storyteller will receive a text message as soon as the request is made, prompting them to call in when they are ready to make their recording.</p>
+                <form action="/generate" method="POST">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" name="title" class="form-control" placeholder="Audio Title" required>
+                    </div>
 
-        <div class="form-group">
-            <label for="tel">Phone Number:</label>
-            <input type="tel" name="tel" class="form-control" placeholder="5555555555" min="10" max="10" required>
+                    <div class="form-group">
+                        <label for="tel">Phone Number:</label>
+                        <input type="tel" name="tel" class="form-control" placeholder="5555555555" min="10" max="10" required>
+                    </div>
+                    <input type="submit" name="twilio" value="Send a request via Text!" class="button">
+                </form>
         </div>
-        <input type="submit" name="twilio" value="Send a request via Text!" class="button">
-    </form>
+    </div>
+
 
     {% endif %}
 

@@ -192,10 +192,8 @@ def generate_request_str():
 
 				twilio_number = '+14153196892'
 
-				message = client.messages.create(body="""%s is requesting an 
-					audio recording. When you are ready, please call %s with
-					Twilio and have this request ID ready: %s!""" % 
-					(user.first_name, twilio_number, request_str),
+				message = client.messages.create(body="""%s is requesting an audio recording for "%s". When you are ready, please call %s and have this request ID ready: %s""" % 
+					(user.first_name, title, twilio_number, request_str),
 
 				to='+1' + tel_number, # number to send request
 				from_='+14153196892') # Twilio number
