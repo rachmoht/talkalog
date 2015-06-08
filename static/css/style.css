@@ -37,7 +37,7 @@ h2 small {
   box-shadow: 0 6px #405972;
   border: none;
   font-family: inherit;
-  font-size: inherit;
+  font-size: 16px;
   cursor: pointer;
   padding: 10px 15px;
   display: inline-block;
@@ -84,6 +84,10 @@ h2 small {
 .navbar-default {
   border-radius: 0;
   border: none; }
+
+.navbar-default .navbar-brand {
+  font-weight: 200;
+  letter-spacing: 1px; }
 
 .navbar-default a,
 .navbar-default .navbar-brand,
@@ -239,5 +243,8 @@ audio {
   clear: both;
   display: block;
   margin: 20px 0 0; }
+
+.modal-body {
+  padding: 15px 15px 20px; }
 
 /*# sourceMappingURL=style.css.map */

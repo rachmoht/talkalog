@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 
+    <h1>Create a Story Request</h1>
+
+    <h5>Choose your preferred way to send a request to the storyteller:</h5>
+
+    <hr>
 
     {% if request_number %}
     <h2>Request sent!</h2>
@@ -12,11 +17,6 @@
     <p>Share this URL to request recording:<br> <a href="/request/{{ generated_url }}">localhost:5000/request/{{ generated_url }}</a></p>
 
     {% else %}
-    <h1>Create a Story Request</h1>
-
-    <h5>Choose your preferred way to send a request to the storyteller:</h5>
-
-    <hr>
 
     <div class="row">
         <div class="col-sm-6">
