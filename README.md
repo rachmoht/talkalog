@@ -24,10 +24,16 @@ In most scenarios, Talkalog has two user roles: the _requestor_ and _storyteller
 
 ### Requests
 
-Requests begin with a generated random string of five numerical characters, stored in the Requests table. Requests are then sent to the storyteller via a URL like _domain.com/request/12345_ or via an SMS like so:
+Requests begin with a generated random string of five numerical characters, stored in the Requests table. Requests are then able to be sent to the storyteller with two options:
+
+1. A request web page: e.g. _domain.com/request/12345_ 
+
+
+
+2. An SMS like so:
 > Requestor is requesting an audio recording for "Grandma's Secret Recipe". When you are ready, please call +18005555555 and have this request ID ready: **12345**
 
 
 
 #### Data Model
-<img src="/rachelledunn/talkalog/raw/master/static/img/etc/data_model.png" alt="Talkalog Data Model" style="max-width: 100%;">
+<img src="/static/img/etc/data_model.png" alt="Talkalog Data Model" style="max-width: 100%;">
