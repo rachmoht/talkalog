@@ -1,5 +1,7 @@
 @import 'base';
 
+/* Basics */
+
 body {
     background-color: $white;
     color: $grey;
@@ -95,6 +97,12 @@ h2 small {
     opacity: .65;
     }
     
+input.form-control {
+    border: 3px solid $beigelt;
+    border-radius: 0;
+    padding: 20px 15px;
+    }
+
 .navbar-default {
     border-radius: 0;
     border: none;
@@ -167,6 +175,9 @@ nav.navbar-home.navbar-default {
         a.btn.btn-default.btn-lg {
             background-color: rgba(255,255,255,0.8);
             }   
+        }
+    h2.featurette-heading {
+        margin-top: 0;
         }
     .footer {
         color: $white;

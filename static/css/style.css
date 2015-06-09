@@ -1,4 +1,5 @@
 @import url(http://fonts.googleapis.com/css?family=Merriweather:300italic,300,700,700italic);
+/* Basics */
 body {
   background-color: #ffffff;
   color: #565a5c; }
@@ -81,6 +82,11 @@ h2 small {
   box-shadow: none;
   opacity: .65; }
 
+input.form-control {
+  border: 3px solid #F4F3F1;
+  border-radius: 0;
+  padding: 20px 15px; }
+
 .navbar-default {
   border-radius: 0;
   border: none; }
@@ -142,6 +148,8 @@ nav.navbar-home.navbar-default {
     padding: 0 0 80px; }
     #home .jumbotron a.btn.btn-default.btn-lg {
       background-color: rgba(255, 255, 255, 0.8); }
+  #home h2.featurette-heading {
+    margin-top: 0; }
   #home .footer {
     color: #ffffff; }
 

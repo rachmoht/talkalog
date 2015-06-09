@@ -1,10 +1,15 @@
 {% extends 'home.html' %}
 {% block content %}
-    <div class="container content">
+    <div class="container-fluid content">    
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+            <div class="alert alert-warning">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
         <div class="row featurette">
             <div class="col-sm-6">
-                <h2 class="featurette-heading">The easiest way to tell a story.</h2>
-                <p class="lead">As simple as a phone call and easier than writing by hand. Preserve your oral history with Talkalog: memories on-the-go.</p>
+                <h2 class="featurette-heading">Connecting People Through Stories</h2>
+                <p class="lead">Talkalog is the easiest way to request, create, store, and manage audio recordings. Send a request to your grandmother to record her coveted family recipes, generate and edit the transcripts, and create a recipe book instantly.</p>
             </div>
             <div class="col-sm-6">
                 <form action="/login-process" method="POST">

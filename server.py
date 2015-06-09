@@ -730,7 +730,12 @@ def thanks_message_request():
 def login_user():
 	"""Login page for user."""
 
-	return render_template('login.html')
+	if 'email' in session: 
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+		return redirect('/profile')
+	else:
+		return render_template('login.html')
 
 
 @app.route('/login-process', methods=['POST'])
@@ -753,15 +758,19 @@ def login_process():
 			return redirect('/login')
 
 	else:
-		flash('No existing account for %s' % entered_email)
-		return redirect('/signup')
+		return redirect('/profile')
 
 
 @app.route('/signup')
 def signup_user():
 	"""Sign up page for new users."""
 
-	return render_template('signup.html')
+	if 'email' in session: 
+		user_email = session['email']
+		user = User.query.filter_by(email=user_email).first()
+		return redirect('/profile')
+	else:
+		return render_template('signup.html')
 
 
 @app.route('/signup-process', methods=['POST'])
