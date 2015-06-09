@@ -39,7 +39,6 @@ h2 small {
     margin: 80px 0;
     }
 
-
 .button {
     background: #6186aa;
     color: #fff;
@@ -154,6 +153,7 @@ nav.navbar-home.navbar-default {
         }
     }
 
+/* Home */
 #home {
     background-size: cover;
     background-attachment: fixed;
@@ -173,7 +173,7 @@ nav.navbar-home.navbar-default {
         }
     }
 
-/* profile */
+/* User profile */
 #recordingslist audio { 
     display: block; margin-bottom: 10px; 
     }
@@ -278,7 +278,7 @@ nav.navbar-home.navbar-default {
     cursor: pointer;
     }
 
-/* audio and listen */
+/* Audio and listen */
 audio {
     display: block;
     margin: 20px auto;

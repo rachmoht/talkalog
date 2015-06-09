@@ -129,6 +129,7 @@ nav.navbar-home.navbar-default {
   .footer p {
     font-style: italic; }
 
+/* Home */
 #home {
   background-size: cover;
   background-attachment: fixed;
@@ -144,7 +145,7 @@ nav.navbar-home.navbar-default {
   #home .footer {
     color: #ffffff; }
 
-/* profile */
+/* User profile */
 #recordingslist audio {
   display: block;
   margin-bottom: 10px; }
@@ -231,7 +232,7 @@ nav.navbar-home.navbar-default {
 #start_button, #stop_button {
   cursor: pointer; }
 
-/* audio and listen */
+/* Audio and listen */
 audio {
   display: block;
   margin: 20px auto; }
