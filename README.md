@@ -14,9 +14,9 @@ JavaScript, jQuery, HTML, Sass, Bootstrap, Python, Flask, Jinja, SQLAlchemy, SQL
 
 As a former front-end developer and designer, one of my main goals was to make Talkalog as intuitive as possible for all users: the requesters and the storytellers. Talkalog was inspired by my desire to capture my family's oral history, mainly stories from my grandparents. This is the main reason I wanted the interface and interactions to be clean, easy, and straightforward for all users no matter what age, level of tech savvy, or web accessibility.
 
-On the web interface, Talkalog uses Recorder.js and HTML5 Web Audio APIs to capture audio recordings. One of the initial challenges was customizing both to integrate with Google's Speech Recognition API in order to generate the text transcript at the same time. 
+On the web interface, Talkalog uses the **Recorder.js** and **HTML5 Web Audio APIs** to capture audio recordings. One of the initial challenges was integrating with **Google's Speech Recognition API** in order to generate the text transcript alongside the recording.
 
-In the other recording option, Twilio is used to allow storytellers to call in at their leisure, with phone prompts being a familiar platform of user interactions of all ages. After phone recordings are created, Google's Speech Recognition API is used to generate the transcript from the audio file in order to overcome Twilio's two-minute transcript limit. The WAVE file saved during the phone recording is served up from Amazon S3, converted into FLAC format, and then processed through Speech Recognition at the user's discretion.
+Talkalog also provides a phone interface option, where **Twilio** is used to allow storytellers to call in at their leisure, with phone prompts being a familiar platform of user interactions of all ages. After phone recordings are created, **Google's Speech Recognition API** is used to generate the transcript from the audio file in order to overcome Twilio's two-minute transcript limit. The WAVE file saved during the phone recording is served up from **Amazon S3**, converted into FLAC format, and then processed through Speech Recognition at the user's discretion.
 
 ## Overview
 
