@@ -1,0 +1,7 @@
+.navbar, audio, .button, .footer, #transcript  {
+  display: none;
+}
+
+.transcript-body {
+  display: block;
+}
