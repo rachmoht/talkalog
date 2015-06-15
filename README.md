@@ -85,3 +85,61 @@ ___
 ### Data Model
 
 <img src="/static/img/readme/data_model.png" alt="Talkalog Data Model" style="max-width: 100%;">
+
+___
+
+### Install Talkalog on Your Machine
+
+Clone or fork this repo: 
+
+```
+https://github.com/rachelledunn/talkalog.git
+```
+
+Create and activate a virtual environment inside your project directory: 
+
+```
+virtualenv env
+
+source env/bin/activate
+```
+
+Install the requirements:
+
+```
+pip install -r requirements.txt
+```
+
+
+Get your own secret keys for <a href="http://twilio.com" target="_blank">Twilio</a> and save them to a file `secrets.sh`. Get your own secret keys for <a href="http://aws.amazon.com/s3/" target="_blank">AWS S3</a> and follow the <a href="http://boto.readthedocs.org/en/latest/getting_started.html#configuring-boto-credentials" target="_blank">Boto instructions</a> on how to set up your keys. Your `secrets.sh` file should look something like this:
+
+```
+export AWS_ACCESS_KEY_ID='YOURSECRETKEYIDHERE'
+export AWS_SECRET_ACCESS_KEY='YOURSECRETACCESSKEYHERE'
+export TWILIO_ACCOUNT_SID='YOURSECRETSIDHERE'
+export TWILIO_AUTH_TOKEN='YOURSECRETAUTHTOKENHERE'
+```
+	
+Source your secret keys:
+
+```
+source secret.sh
+```
+
+Run the app:
+
+```
+python server.py
+```
+
+Download and unzip <a href="https://ngrok.com/" target="_blank">ngrok</a> to create a secure tunnel to your localhost to allow Twilio access for voice routes.
+
+Run ngrok:
+```
+./ngrok http 5000
+```
+
+Copy the new ngrok forwarding URL (`http://example.ngrok.io`) and update the <a href="https://www.twilio.com/user/account/phone-numbers/incoming" target="_blank">request URL for your Twilio number</a>.
+
+Navigate to `localhost:5000` 
+
