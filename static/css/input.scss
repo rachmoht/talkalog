@@ -41,52 +41,95 @@ h2 small {
     margin: 80px 0;
     }
 
+// .button {
+//     background: #6186aa;
+//     color: #fff;
+//     box-shadow: 0 6px #405972;
+//     border: none;
+//     font-family: inherit;
+//     font-size: 16px;
+//     cursor: pointer;
+//     padding: 10px 15px;
+//     display: inline-block;
+//     text-transform: uppercase;
+//     letter-spacing: 1px;
+//     font-weight: 700;
+//     outline: none;
+//     position: relative;
+//     border-radius: 3px;
+//     -webkit-transition: none;
+//     -moz-transition: none;
+//     transition: none;
+//     &:after {
+//         content: '';
+//         position: absolute;
+//         z-index: -1;
+//         -webkit-transition: all 0.3s;
+//         -moz-transition: all 0.3s;
+//         transition: all 0.3s;
+//         }
+//     &:hover {
+//         background: #6186aa;
+//         box-shadow: 0 4px #405972;
+//         top: 2px;
+//         color: $white;
+//         }
+//     &:focus {
+//         background: #6186aa;
+//         box-shadow: 0 4px #405972;
+//         top: 2px;
+//         color: $white;
+//         }
+//     &:active {
+//         background: #6186aa;
+//         box-shadow: 0 0 #405972;
+//         top: 6px;
+//         color: $white;
+//         }
+//     }
+
 .button {
-    background: #6186aa;
-    color: #fff;
-    box-shadow: 0 6px #405972;
-    border: none;
-    font-family: inherit;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 10px 15px;
     display: inline-block;
+    text-decoration: none;
+    // border: 3px solid #F4F3EC;
+    border: none;
+    height: 36px;
+    line-height: 36px;
+    color: $white;
+    background: #A5C1B4;
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+    font-size: 1em;
+    padding: 2px 15px;
+    -webkit-transition: all 0.2s ease-out;
+    -moz-transition: all 0.2s ease-out;
+    -o-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    cursor: pointer;
+    zoom: 1;
+    -webkit-backface-visibility: hidden;
+    position: relative;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 700;
-    outline: none;
-    position: relative;
-    border-radius: 3px;
-    -webkit-transition: none;
-    -moz-transition: none;
-    transition: none;
-    &:after {
-        content: '';
-        position: absolute;
-        z-index: -1;
-        -webkit-transition: all 0.3s;
-        -moz-transition: all 0.3s;
-        transition: all 0.3s;
-        }
+    font-size: 12px;
     &:hover {
-        background: #6186aa;
-        box-shadow: 0 4px #405972;
-        top: 2px;
-        color: $white;
+        -webkit-transition: 0.2s ease;
+        -moz-transition: 0.2s ease;
+        -o-transition: 0.2s ease;
+        transition: 0.2s ease;
+        background-color: $peach;
+        color: #ffffff;
         }
     &:focus {
-        background: #6186aa;
-        box-shadow: 0 4px #405972;
-        top: 2px;
-        color: $white;
-        }
-    &:active {
-        background: #6186aa;
-        box-shadow: 0 0 #405972;
-        top: 6px;
-        color: $white;
+        outline: none;
         }
     }
+
 
 .button.disabled, .button[disabled], fieldset[disabled] .button {
     pointer-events: none;
@@ -98,7 +141,6 @@ h2 small {
     }
     
 input.form-control {
-    border: 3px solid $beigelt;
     border-radius: 0;
     padding: 20px 15px;
     }
@@ -106,6 +148,8 @@ input.form-control {
 .navbar-default {
     border-radius: 0;
     border: none;
+    background: transparent;
+    border-bottom: 1px solid rgba(244, 243, 241, 0.2);
     }
 
 .navbar-default .navbar-brand {
@@ -118,7 +162,7 @@ input.form-control {
 .navbar-default .navbar-nav>li>a {
     color: $grey;
     &:hover {
-        color: $greylt;
+        color: $beige;
         }
     }
 
@@ -140,7 +184,7 @@ nav.navbar-home.navbar-default {
     }
 
 .content {
-    background-color: rgba(255,255,255,0.9);
+    background-color: rgba(255,255,255,0.7);
     padding-top: 40px;
     padding-bottom: 80px;
     }
@@ -172,6 +216,7 @@ nav.navbar-home.navbar-default {
         color: $white;
         background-color: transparent;
         padding: 0 0 80px;
+        text-shadow: 0 1px 3px $grey;
         a.btn.btn-default.btn-lg {
             background-color: rgba(255,255,255,0.8);
             }   
@@ -307,4 +352,10 @@ audio {
 
 .modal-body {
     padding: 15px 15px 20px;
+    }
+
+.lead {
+    .small {
+        font-size: 11px !important;
+        }
     }

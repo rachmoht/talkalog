@@ -192,7 +192,7 @@ def generate_request_str():
 
 				twilio_number = '+14153196892'
 
-				message = client.messages.create(body="""%s is requesting an audio recording for "%s". When you are ready, please call %s and have this request ID ready: %s""" % 
+				message = client.messages.create(body="""Talkalog: %s is requesting an audio recording for "%s". When you are ready, please call %s and have this request ID ready: %s""" % 
 					(user.first_name, title, twilio_number, request_str),
 
 				to='+1' + tel_number, # number to send request
@@ -480,7 +480,25 @@ def generate_transcript(id):
 	# 		print("Could not understand audio")
 
 	# hardcoded for demo purposes
-	generated_transcript = 'Ideas for Friend Date App, take one Use Facebook to connect friends nearby and cross reference with event websites'
+	generated_transcript = """In the Great Green Room there was a telephone and red balloon.
+		And a picture of the cow jumping over the moon!
+		And there were three little bears sitting on chairs.
+		And two little kittens and a pair of mittens.
+		And a little toy house and a young mouse, and a comb and a brush and a bowl full of mush.
+		 
+		And acquire old lady who is whispering "hush"!
+		 
+		Goodnight room, goodnight Moon!
+		Goodnight cow jumping over the moon.
+		Goodnight light and the red balloon.
+		Goodnight bears, goodnight chairs.
+		Goodnight kitchens and goodnight mittens.
+		Goodnight clocks and goodnight Zox, goodnight little house and goodnight Mouse.
+		Goodnight comb and goodnight brush, goodnight nobody, goodnight mush.
+		 
+		And goodnight to the old lady whispering "hush"!
+		 
+		Goodnight stars, goodnight air, goodnight noises everywhere."""
 
 	return jsonify(transcript=generated_transcript)    
 
@@ -713,7 +731,7 @@ def success_message_upload():
 	collection_id = request.args.get('COLLECTION_ID')
 	collection = Collection.query.get(collection_id)
 
-	flash('Upload %s added to collection %s!' % (
+	flash('%s added to collection %s!' % (
 		upload.title, collection.title))
 	return redirect('/profile')
 

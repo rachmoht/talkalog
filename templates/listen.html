@@ -67,7 +67,7 @@
 {% block footerimports %}
 <script>
 $('#load').click(function () {
-    $('#transcript-content').html('<img id="loader-img" alt="" src="/static/img/loading.gif" width="25" height="25" align="center" />');
+    $('#transcript-content').html('<span class="small"><img id="loader-img" alt="" src="/static/img/loading.gif" width="25" height="25" align="center" /> Please wait... the transcript may take up to two minutes to render.</span>');
     $(this).hide();
 
     var uploadId = $('#upload-title').attr('upload-id');
