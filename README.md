@@ -1,6 +1,6 @@
 # Talkalog
 
-Talkalog is the easiest way to request, create, store, and manage audio recordings. Send a request to your grandmother to record her coveted family recipes, generate and edit the transcripts, and create a recipe book instantly.
+Talkalog is the easiest way to request, create, store, and manage audio recordings built by <a href="http://linkedin.com/in/rachelledunn" target="_blank">Rachelle Dunn</a>. Send a request to your grandmother to record her coveted family recipes, generate and edit the transcripts, and create a recipe book instantly.
 
 #### Technology Stack
 
@@ -114,8 +114,6 @@ pip install -r requirements.txt
 Get your own secret keys for <a href="http://twilio.com" target="_blank">Twilio</a> and save them to a file `secrets.sh`. Get your own secret keys for <a href="http://aws.amazon.com/s3/" target="_blank">AWS S3</a> and follow the <a href="http://boto.readthedocs.org/en/latest/getting_started.html#configuring-boto-credentials" target="_blank">Boto instructions</a> on how to set up your keys. Your `secrets.sh` file should look something like this:
 
 ```
-export AWS_ACCESS_KEY_ID='YOURSECRETKEYIDHERE'
-export AWS_SECRET_ACCESS_KEY='YOURSECRETACCESSKEYHERE'
 export TWILIO_ACCOUNT_SID='YOURSECRETSIDHERE'
 export TWILIO_AUTH_TOKEN='YOURSECRETAUTHTOKENHERE'
 ```
@@ -124,6 +122,13 @@ Source your secret keys:
 
 ```
 source secret.sh
+```
+
+Follow the Boto instructions on how to set up your keys here. They will be sourced automatically with the server. Your `~/.boto` file should look something like this:
+
+```
+export AWS_ACCESS_KEY_ID=YOURSECRETKEYIDHERE
+export AWS_SECRET_ACCESS_KEY=YOURSECRETACCESSKEYHERE
 ```
 
 Run the app:
