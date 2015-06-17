@@ -263,7 +263,7 @@ $('#start_button').click(function() {
 $('#stop_button').click(function() {
   $('#stop_button').hide();
   $('#record-status').hide();
-$ ('#submit-audio').prop('disabled',false);
+  $ ('#submit-audio').prop('disabled',false);
   stopRecording(this); 
   startButton(event);
 });
