@@ -2,6 +2,8 @@
 
 Talkalog is the easiest way to request, create, store, and manage audio recordings built by <a href="http://linkedin.com/in/rachelledunn" target="_blank">Rachelle Dunn</a>. Send a request to your grandmother to record her coveted family recipes, generate and edit the transcripts, and create a recipe book instantly.
 
+<img src="/static/img/readme/splash.png" alt="Talkalog">
+
 #### Technology Stack
 
 JavaScript, jQuery, HTML, Sass, Bootstrap, Python, Flask, Jinja, SQLAlchemy, SQLite, Amazon S3, <a href="https://jqueryui.com/draggable/" target="_blank">jQuery UI Draggable and Droppable</a>, <a href="http://getbootstrap.com/javascript/#collapse" target="_blank">Bootstrap Collapse.js</a>, and <a href="http://vitalets.github.io/x-editable/" target="_blank">X-editable</a>
