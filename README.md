@@ -1,6 +1,6 @@
 # Talkalog
 
-Talkalog is the easiest way to request, create, store, and manage audio recordings built by <a href="http://linkedin.com/in/rachelledunn" target="_blank">Rachelle Dunn</a>. Send a request to your grandmother to record her coveted family recipes, generate and edit the transcripts, and create a recipe book instantly.
+Talkalog is the easiest way to request, create, store, and manage audio recordings built by <a href="http://linkedin.com/in/rachmoht" target="_blank">Rachelle Mohtadi</a>. Send a request to your grandmother to record her coveted family recipes, generate and edit the transcripts, and create a recipe book instantly.
 
 <img src="/static/img/readme/splash.png" alt="Talkalog">
 
